@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤖 Chatbot Fitness - Interface de Test</title>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #45a049;
+            --background-color: #f5f5f5;
+            --message-user: #e3f2fd;
+            --message-bot: #f1f8e9;
+            --text-dark: #333;
+            --text-light: #666;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .chat-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            min-height: 80vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--primary-color);
+            color: white;
+            padding: 30px 20px;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .logo p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .user-info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .user-info h3 {
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .level-selector, .quick-questions {
+            margin-bottom: 25px;
+        }
+
+        .level-selector select, .quick-questions select {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            background: white;
+            color: var(--text-dark);
+        }
+
+        .quick-questions h4 {
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .stats {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .stats div {
+            margin-bottom: 5px;
+        }
+
+        /* Chat Area */
+        .chat-area {
+            display: flex;
+            flex-direction: column;
+            background: var(--background-color);
+        }
+
+        .chat-header {
+            background: white;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            text-align: center;
+        }
+
+        .chat-header h2 {
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .messages-container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            max-height: 60vh;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message.bot {
+            justify-content: flex-start;
+        }
+
+        .message-bubble {
+            max-width: 70%;
+            padding: 15px;
+            border-radius: 18px;
+            position: relative;
+            line-height: 1.4;
+        }
+
+        .message.user .message-bubble {
+            background: var(--message-user);
+            border-bottom-right-radius: 5px;
+        }
+
+        .message.bot .message-bubble {
+            background: var(--message-bot);
+            border-bottom-left-radius: 5px;
+        }
+
+        .message-time {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-top: 5px;
+            text-align: right;
+        }
+
+        .message.bot .message-time {
+            text-align: left;
+        }
+
+        .input-area {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            outline: none;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .message-input:focus {
+            border-color: var(--primary-color);
+        }
+
+        .send-button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        .send-button:hover {
+            background: var(--secondary-color);
+        }
+
+        .send-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .quick-action {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 12px;
+            margin: 5px;
+            transition: background 0.3s;
+        }
+
+        .quick-action:hover {
+            background: var(--secondary-color);
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 15px;
+            color: var(--text-light);
+            font-style: italic;
+        }
+
+        .document-reference {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .chat-container {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                display: none;
+            }
+            .message-bubble {
+                max-width: 85%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <h1>🤖 FitnessBot</h1>
+                <p>Votre assistant fitness intelligent</p>
+            </div>
+            
+            <div class="user-info">
+                <h3>📊 Session Info</h3>
+                <div id="session-info">Chargement...</div>
+            </div>
+
+            <div class="level-selector">
+                <h3>🎯 Votre Niveau</h3>
+                <select id="user-level">
+                    <option value="debutant">🏃‍♂️ Débutant</option>
+                    <option value="intermediaire">💪 Intermédiaire</option>
+                    <option value="avance">🔥 Avancé</option>
+                </select>
+            </div>
+
+            <div class="quick-questions">
+                <h3>💡 Questions Rapides</h3>
+                <select id="quick-questions">
+                    <option value="">Choisir une question...</option>
+                    <option value="Je veux commencer le sport, que me conseillez-vous ?">🚀 Commencer le sport</option>
+                    <option value="Quels exercices pour débutant à la maison ?">🏠 Exercices maison</option>
+                    <option value="Comment me motiver à faire du sport régulièrement ?">💫 Motivation</option>
+                    <option value="Quelle alimentation pour perdre du poids ?">🥗 Nutrition perte poids</option>
+                    <option value="Comment mieux dormir pour récupérer ?">😴 Sommeil et récupération</option>
+                    <option value="Programme d'entraînement pour débutant">📋 Programme débutant</option>
+                    <option value="Comment gérer le stress par le sport ?">🧘‍♂️ Gestion du stress</option>
+                    <option value="Conseils pour rester discipliné">⚡ Discipline sportive</option>
+                </select>
+            </div>
+
+            <div class="stats">
+                <h3>📈 Statistiques</h3>
+                <div>Messages: <span id="message-count">0</span></div>
+                <div>Session: <span id="session-time">Nouvelle</span></div>
+            </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="chat-area">
+            <div class="chat-header">
+                <h2>💬 Chat avec FitnessBot</h2>
+                <p>Posez vos questions sur le fitness, la nutrition et la santé</p>
+            </div>
+
+            <div class="messages-container" id="messages-container">
+                <!-- Messages will appear here -->
+                <div class="message bot">
+                    <div class="message-bubble">
+                        <strong>🤖 FitnessBot:</strong><br>
+                        Bonjour ! Je suis votre assistant fitness personnel. 🌟<br><br>
+                        Je peux vous aider avec :
+                        • Programmes d'entraînement 🏋️‍♂️<br>
+                        • Conseils nutritionnels 🥗<br>
+                        • Motivation et discipline 💪<br>
+                        • Sommeil et récupération 😴<br><br>
+                        <em>N'oubliez pas : je suis un assistant virtuel. Consultez un professionnel de santé pour des conseils personnalisés.</em>
+                        <div class="message-time" id="current-time"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="typing-indicator" id="typing-indicator">
+                FitnessBot est en train de réfléchir...
+            </div>
+
+            <div class="input-area">
+                <input type="text" class="message-input" id="message-input" 
+                       placeholder="Posez votre question sur le fitness, la nutrition, la motivation..." 
+                       maxlength="500">
+                <button class="send-button" id="send-button" onclick="sendMessage()">
+                    Envoyer 🚀
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class FitnessChatInterface {
+            constructor() {
+                this.sessionId = this.generateSessionId();
+                this.messageCount = 0;
+                this.init();
+            }
+
+            generateSessionId() {
+                // Générer ou récupérer l'ID de session
+                let sessionId = localStorage.getItem('fitness_chat_session');
+                if (!sessionId) {
+                    sessionId = 'web_session_' + Math.random().toString(36).substr(2, 9);
+                    localStorage.setItem('fitness_chat_session', sessionId);
+                }
+                return sessionId;
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.updateSessionInfo();
+                this.updateTime();
+                setInterval(() => this.updateTime(), 60000);
+            }
+
+            setupEventListeners() {
+                // Envoi avec Enter
+                document.getElementById('message-input').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.sendMessage();
+                    }
+                });
+
+                // Questions rapides
+                document.getElementById('quick-questions').addEventListener('change', (e) => {
+                    if (e.target.value) {
+                        document.getElementById('message-input').value = e.target.value;
+                        this.sendMessage();
+                        e.target.value = '';
+                    }
+                });
+
+                // Actions rapides
+                document.querySelectorAll('.quick-action').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        document.getElementById('message-input').value = e.target.textContent;
+                        this.sendMessage();
+                    });
+                });
+            }
+
+            async sendMessage() {
+                const input = document.getElementById('message-input');
+                const message = input.value.trim();
+                const userLevel = document.getElementById('user-level').value;
+
+                if (!message) return;
+
+                // Désactiver l'entrée pendant l'envoi
+                input.disabled = true;
+                document.getElementById('send-button').disabled = true;
+
+                // Afficher le message de l'utilisateur
+                this.addMessage(message, 'user');
+
+                // Afficher l'indicateur de frappe
+                this.showTypingIndicator();
+
+                try {
+                    const response = await fetch('/api/chat-api/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            message: message,
+                            session_id: this.sessionId,
+                            user_level: userLevel
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    // Masquer l'indicateur de frappe
+                    this.hideTypingIndicator();
+
+                    if (data.success) {
+                        this.addMessage(data.response, 'bot');
+                        this.messageCount += 2; // User + Bot
+                        this.updateStats();
+                    } else {
+                        this.addMessage(`❌ Erreur: ${data.error}`, 'bot');
+                    }
+
+                } catch (error) {
+                    this.hideTypingIndicator();
+                    this.addMessage('❌ Erreur de connexion au serveur', 'bot');
+                    console.error('Erreur:', error);
+                }
+
+                // Réactiver l'entrée
+                input.disabled = false;
+                document.getElementById('send-button').disabled = false;
+                input.value = '';
+                input.focus();
+            }
+
+            addMessage(content, sender) {
+                const messagesContainer = document.getElementById('messages-container');
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${sender}`;
+
+                const bubble = document.createElement('div');
+                bubble.className = 'message-bubble';
+                
+                // Formater la réponse du bot avec mise en forme
+                if (sender === 'bot') {
+                    const formattedContent = this.formatBotResponse(content);
+                    bubble.innerHTML = `<strong>🤖 FitnessBot:</strong><br>${formattedContent}`;
+                } else {
+                    bubble.innerHTML = `<strong>👤 Vous:</strong><br>${this.escapeHtml(content)}`;
+                }
+
+                const timeDiv = document.createElement('div');
+                timeDiv.className = 'message-time';
+                timeDiv.textContent = this.getCurrentTime();
+
+                bubble.appendChild(timeDiv);
+                messageDiv.appendChild(bubble);
+                messagesContainer.appendChild(messageDiv);
+
+                // Scroll vers le bas
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+
+            formatBotResponse(content) {
+                // Échapper le HTML pour sécurité
+                let formatted = this.escapeHtml(content);
+                
+                // Mise en forme basique
+                formatted = formatted
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                    .replace(/💡/g, '💡 ')
+                    .replace(/📚/g, '<br>📚 ')
+                    .replace(/⚠️/g, '<br>⚠️ ')
+                    .replace(/\n/g, '<br>');
+
+                return formatted;
+            }
+
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            showTypingIndicator() {
+                document.getElementById('typing-indicator').style.display = 'block';
+                document.getElementById('messages-container').scrollTop = 
+                    document.getElementById('messages-container').scrollHeight;
+            }
+
+            hideTypingIndicator() {
+                document.getElementById('typing-indicator').style.display = 'none';
+            }
+
+            getCurrentTime() {
+                return new Date().toLocaleTimeString('fr-FR', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+            }
+
+            updateTime() {
+                document.getElementById('current-time').textContent = this.getCurrentTime();
+            }
+
+            async updateSessionInfo() {
+                try {
+                    const response = await fetch(`/api/history/${this.sessionId}/`);
+                    const data = await response.json();
+
+                    if (data.success) {
+                        document.getElementById('session-info').innerHTML = `
+                            ID: ${data.session_info.session_id.substr(0, 10)}...<br>
+                            Niveau: ${data.session_info.user_level}<br>
+                            Messages: ${data.session_info.total_messages}
+                        `;
+                        this.messageCount = data.session_info.total_messages;
+                        this.updateStats();
+                    }
+                } catch (error) {
+                    console.error('Erreur chargement session:', error);
+                }
+            }
+
+            updateStats() {
+                document.getElementById('message-count').textContent = this.messageCount;
+                
+                // Calculer la durée de session approximative
+                const sessionStart = localStorage.getItem('session_start');
+                if (!sessionStart) {
+                    localStorage.setItem('session_start', new Date().toISOString());
+                    document.getElementById('session-time').textContent = 'Nouvelle';
+                } else {
+                    const duration = Math.floor((new Date() - new Date(sessionStart)) / 60000);
+                    document.getElementById('session-time').textContent = `${duration} min`;
+                }
+            }
+        }
+
+        // Initialiser l'interface quand la page est chargée
+        document.addEventListener('DOMContentLoaded', () => {
+            window.chatInterface = new FitnessChatInterface();
+        });
+
+        // Fonctions globales pour les boutons
+        function sendMessage() {
+            window.chatInterface.sendMessage();
+        }
+    </script>
+</body>
+</html>
