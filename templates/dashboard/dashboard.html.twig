@@ -19,7 +19,7 @@
         <nav class="dashboard-navbar">
             <div class="navbar-left">
                 <a href="{{ path('app_home') }}" class="dashboard-logo">
-                    <img src="{{ asset('images/healFit-logo.png') }}" alt="HealFit Logo" class="logo-img">
+                    <img src="{{ asset('assets/images/healFit-logo.png') }}" alt="HealFit Logo" class="logo-img">
                     <span class="logo-text">
                         <span class="logo-part1">HEAL</span>
                         <span class="logo-part2">FIT</span>
@@ -47,13 +47,13 @@
                 <!-- Profil Utilisateur -->
                 <div class="user-profile-dropdown">
                     <div class="user-avatar" id="userMenuTrigger">
-                        <img src="{{ asset('images/default-avatar.jpg') }}" alt="Photo de profil" class="profile-img">
+                        <img src="{{ asset('assets/images/default-avatar.jpg') }}" alt="Photo de profil" class="profile-img">
                         <i class="fas fa-chevron-down"></i>
                     </div>
 
                     <div class="dropdown-menu" id="userMenu">
                         <div class="user-info">
-                            <img src="{{ asset('images/default-avatar.jpg') }}" alt="Photo de profil" class="menu-profile-img">
+                            <img src="{{ asset('assets/images/default-avatar.jpg') }}" alt="Photo de profil" class="menu-profile-img">
                             <div class="user-details">
                                 <h4>John Doe</h4>
                                 <p>Membre Premium</p>
@@ -79,10 +79,14 @@
 
                         <div class="dropdown-divider"></div>
 
-                        <a href="#" class="dropdown-item logout">
-                            <i class="fas fa-sign-out-alt"></i>
-                            <span>Déconnexion</span>
-                        </a>
+                        <!-- FORMULAIRE DE DÉCONNEXION (POST avec CSRF) -->
+                            <form action="{{ path('app_logout') }}" method="POST" class="logout-form">
+                                <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
+                                <button type="submit" class="dropdown-item logout">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    <span>Déconnexion</span>
+                                </button>
+                            </form>
                     </div>
                 </div>
             </div>

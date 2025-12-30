@@ -7,7 +7,6 @@
 
     <!-- Fichier CSS -->
     <link rel="stylesheet" href="{{ asset('assets/styles/home.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/styles/login_modal.css') }}">
 
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -18,7 +17,7 @@
         <div class="container">
             <nav class="navbar">
                 <a href="{{ path('app_home') }}" class="logo">
-                    <img src="{{ asset('images/healFit-logo.png') }}" alt="HealFit Logo" class="logo-img">
+                    <img src="{{ asset('assets/images/healFit-logo.png') }}" alt="HealFit Logo" class="logo-img">
                 </a>
 
                 <div class="nav-links">
@@ -44,8 +43,8 @@
 
                     <div class="auth-buttons">
                         <!-- MODIFICATION : Boutons transformés en liens -->
-                        <a id="openLoginBtn" class="btn btn-login">Se connecter</a>
-                        <a  id="openRegisterBtn" class="btn btn-signup">S'inscrire</a>
+                        <a href="{{ path('app_login') }}" id="openLoginBtn" class="btn btn-login">Se connecter</a>
+                        <a href="{{ path('app_register') }}" id="openRegisterBtn" class="btn btn-signup">S'inscrire</a>
                     </div>
                 </div>
             </nav>
@@ -404,9 +403,14 @@
             </div>
         </div>
     </footer>
-      {% include 'login/login.html.twig' %}
     <!-- Fichier JS -->
-    <script src="{{ asset('js/login.js') }}"></script>
+    <script src="{{ asset('js/auth.js') }}"></script>
+
     <script src="{{ asset('js/script.js') }}"></script>
+    <script>
+    document.getElementById('openHeroRegisterBtn').addEventListener('click', function () {
+        window.location.href = "{{ path('app_register') }}";
+    });
+</script>
 </body>
 </html>

@@ -1154,3 +1154,38 @@ body {
         right: 20px;
     }
 }
+
+/*logout*/
+/* Styles pour le formulaire de déconnexion */
+.logout-form {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.logout-form button.dropdown-item {
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: inherit;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    color: #f44336;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.logout-form button.dropdown-item:hover {
+    background-color: rgba(244, 67, 54, 0.1);
+    color: #d32f2f;
+}
+
+.logout-form button.dropdown-item i {
+    color: #f44336;
+    width: 20px;
+}
