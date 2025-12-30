@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Communauté - HealFit</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ asset('assets/styles/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/styles/communaute.css') }}">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Navbar -->
+        <nav class="dashboard-navbar">
+            <div class="navbar-left">
+                <a href="{{ path('app_home') }}" class="dashboard-logo">
+                    <img src="{{ asset('assets/images/healFit-logo.png') }}" alt="HealFit Logo" class="logo-img">
+                    <span class="logo-text">
+                        <span class="logo-part1">HEAL</span>
+                        <span class="logo-part2">FIT</span>
+                    </span>
+                </a>
+            </div>
+
+            <div class="navbar-center">
+                <h1 class="dashboard-title">Communauté Sportive</h1>
+            </div>
+
+            <div class="navbar-right">
+                <!-- Notification -->
+                <div class="notification-icon">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                </div>
+                <!-- Messagerie -->
+                <div class="messaging-icon">
+                    <i class="fas fa-envelope"></i>
+                    <span class="message-badge">5</span>
+                </div>
+
+                <!-- Profil Utilisateur -->
+                <div class="user-profile-dropdown">
+                    <div class="user-avatar" id="userMenuTrigger">
+                        {% if user.profileImage %}
+                            <img src="{{ asset('uploads/profile_images/' ~ user.profileImage) }}"
+                                alt="Photo de profil"
+                                class="profile-img"
+                                onerror="this.src='{{ asset('assets/images/default-avatar.jpg') }}'">
+                        {% else %}
+                            <img src="{{ asset('assets/images/default-avatar.jpg') }}"
+                                alt="Photo de profil"
+                                class="profile-img">
+                        {% endif %}
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+
+                    <div class="dropdown-menu" id="userMenu">
+                        <div class="user-info">
+                            {% if user.profileImage %}
+                                <img src="{{ asset('uploads/profile_images/' ~ user.profileImage) }}"
+                                    alt="Photo de profil"
+                                    class="menu-profile-img"
+                                    onerror="this.src='{{ asset('assets/images/default-avatar.jpg') }}'">
+                            {% else %}
+                                <img src="{{ asset('assets/images/default-avatar.jpg') }}"
+                                    alt="Photo de profil"
+                                    class="menu-profile-img">
+                            {% endif %}
+                            <div class="user-details">
+                                <h4>{{ user.fullName }}</h4>
+                                <p>Membre {% if 'ROLE_PREMIUM' in user.roles %}Premium{% else %}Standard{% endif %}</p>
+                            </div>
+                        </div>
+
+                        <div class="dropdown-divider"></div>
+
+                        <a href="{{ path('app_profil') }}" class="dropdown-item">
+                            <i class="fas fa-user-circle"></i>
+                            <span>Mon Profil</span>
+                        </a>
+
+                        <a href="{{ path('app_dashboard') }}" class="dropdown-item">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Tableau de bord</span>
+                        </a>
+
+                        <a href="{{ path('app_communaute') }}" class="dropdown-item active">
+                            <i class="fas fa-users"></i>
+                            <span>Communauté</span>
+                        </a>
+
+                        <div class="dropdown-divider"></div>
+
+                        <!-- FORMULAIRE DE DÉCONNEXION -->
+                        <form action="{{ path('app_logout') }}" method="POST" class="logout-form">
+                            <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
+                            <button type="submit" class="dropdown-item logout">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Déconnexion</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Sidebar -->
+<aside class="dashboard-sidebar">
+            <div class="sidebar-header">
+                <h3><i class="fas fa-bars"></i> Menu</h3>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-menu">
+                <a href="{{ path('app_dashboard') }}" class="menu-item active">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Tableau de bord</span>
+                </a>
+
+                <div class="menu-section">
+                    <h4>Santé & Fitness</h4>
+
+                    <a href="#" class="menu-item">
+                        <i class="fas fa-utensils"></i>
+                        <span>Régime alimentaire</span>
+                        <span class="badge">Nouveau</span>
+                    </a>
+
+                    <a href="#" class="menu-item">
+                        <i class="fas fa-dumbbell"></i>
+                        <span>Workout personnalisé</span>
+                    </a>
+
+                    <a href="#" class="menu-item">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Planning d'entraînement</span>
+                    </a>
+
+                    <a href="#" class="menu-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>Salle de sport proche</span>
+                    </a>
+                </div>
+
+                <div class="menu-section">
+                    <h4>Expertise</h4>
+
+                    <a href="#" class="menu-item">
+                        <i class="fas fa-user-md"></i>
+                        <span>Nutritionniste expert</span>
+                    </a>
+
+                    <a href="{{ path('app_communaute') }}" class="menu-item">
+                        <i class="fas fa-users"></i>
+                        <span>Communauté</span>
+                        <span class="badge">{{ totalMembers }}</span>
+                    </a>
+
+                    <a href="#" class="menu-item">
+                        <i class="fas fa-building"></i>
+                        <span>Partenaires fitness</span>
+                    </a>
+                </div>
+
+                <div class="menu-section">
+                    <h4>Progression</h4>
+
+                    <a href="#" class="menu-item">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Mes progrès</span>
+                    </a>
+
+                    <a href="#" class="menu-item">
+                        <i class="fas fa-trophy"></i>
+                        <span>Mes objectifs</span>
+                    </a>
+
+                    <a href="#" class="menu-item">
+                        <i class="fas fa-award"></i>
+                        <span>Mes badges</span>
+                        <span class="badge">8</span>
+                    </a>
+                </div>
+
+                <div class="menu-section">
+                    <h4>Ressources</h4>
+
+                    <a href="#" class="menu-item">
+                        <i class="fas fa-book"></i>
+                        <span>Guide santé</span>
+                    </a>
+
+                    <a href="#" class="menu-item">
+                        <i class="fas fa-video"></i>
+                        <span>Vidéos d'exercices</span>
+                    </a>
+
+                    <a href="#" class="menu-item">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Rapports mensuels</span>
+                    </a>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-progress">
+                    <div class="progress-info">
+                        <span>Progression mensuelle</span>
+                        <span>65%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 65%"></div>
+                    </div>
+                </div>
+
+                <button class="premium-btn">
+                    <i class="fas fa-crown"></i>
+                    Passer à Premium
+                </button>
+            </div>
+        </aside>
+
+        <!-- Contenu principal - Communauté -->
+        <main class="dashboard-content">
+            <!-- En-tête de la communauté -->
+            <div class="community-header">
+                <div class="header-content">
+                    <h2><i class="fas fa-users"></i> Trouvez un Partenaire de Sport</h2>
+                    <p>Rejoignez notre communauté pour vous motiver, échanger et progresser ensemble</p>
+                </div>
+                <div class="header-stats">
+                    <div class="stat-card">
+                        <i class="fas fa-user-friends"></i>
+                        <div>
+
+                            <h3>{{ totalMembers }}</h3>
+                            <span>Membres total</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-running"></i>
+                        <div>
+                            <h3 id="onlineMembers">1</h3>
+                            <span>En ligne maintenant</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Grille des membres -->
+            <div class="community-members-grid">
+                <div class="section-header">
+                    <h3><i class="fas fa-user-friends"></i> Membres disponibles</h3>
+                    <div class="members-count">
+                        <span id="membersCount">{{ members|length }}</span> membres
+                    </div>
+                </div>
+
+                <div class="members-container" id="membersContainer">
+                    {% if members|length > 0 %}
+                        {% for member in members %}
+                            <div class="member-card" data-id="{{ member.id }}">
+                                <div class="member-header">
+                                    <img src="{{ member.avatar }}"
+                                        alt="{{ member.name }}"
+                                        class="member-avatar"
+                                        onerror="this.src='https://ui-avatars.com/api/?name={{ member.name|url_encode }}&background=2e7d32&color=fff&size=100'">
+                                    <div class="member-info">
+                                        <h4>{{ member.name }}</h4>
+                                        <p class="member-email">{{ member.email }}</p>
+                                        <div class="member-status">
+                                            <i class="fas fa-circle status-{{ member.online ? 'online' : 'offline' }}"></i>
+                                            <span>{{ member.online ? 'En ligne' : 'Hors ligne' }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="member-actions">
+                                    <button class="contact-btn" data-member-id="{{ member.id }}">
+                                        <i class="fas fa-comment-dots"></i> Contacter
+                                    </button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="no-members">
+                            <i class="fas fa-users-slash"></i>
+                            <p>Aucun autre membre dans la communauté pour le moment.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+
+        </main>
+
+        <!-- Modal de contact -->
+        <div class="modal-overlay" id="contactModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-comment-dots"></i> Contacter un partenaire</h3>
+                    <button class="modal-close" id="closeModal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="member-info-modal">
+                        <img src="" alt="Photo" class="modal-avatar" id="modalAvatar">
+                        <div>
+                            <h4 id="modalName">Nom du membre</h4>
+                        </div>
+                    </div>
+
+                    <form class="contact-form" id="contactForm">
+                        <div class="form-group">
+                            <label for="messageContent">Votre message</label>
+                            <textarea id="messageContent" rows="4" placeholder="Bonjour, je souhaiterais vous accompagner pour une session de sport..."></textarea>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn-cancel" id="cancelContact">Annuler</button>
+                            <button type="submit" class="btn-send">
+                                <i class="fas fa-paper-plane"></i> Envoyer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <!-- Ajoutez ce script après la déclaration des membres -->
+    <script>
+        // Passer les données PHP au JavaScript
+        window.serverMembersData = {{ members|json_encode|raw }};
+    </script>
+    <script src="{{ asset('js/communaute.js') }}"></script>
+</body>
+</html>

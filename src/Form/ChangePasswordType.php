@@ -1,0 +1,72 @@
+<?php
+// src/Form/ChangePasswordType.php
+
+namespace App\Form;
+
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Regex;
+
+class ChangePasswordType extends AbstractType
+{
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+        $builder
+            ->add('oldPassword', PasswordType::class, [
+                'label' => 'Mot de passe actuel',
+                'attr' => [
+                    'placeholder' => 'Votre mot de passe actuel',
+                    'class' => 'form-control'
+                ],
+                'constraints' => [
+                    new NotBlank([
+                        'message' => 'Veuillez entrer votre mot de passe actuel',
+                    ]),
+                ],
+            ])
+            ->add('newPassword', RepeatedType::class, [
+                'type' => PasswordType::class,
+                'invalid_message' => 'Les mots de passe doivent correspondre.',
+                'first_options' => [
+                    'label' => 'Nouveau mot de passe',
+                    'attr' => [
+                        'placeholder' => 'Votre nouveau mot de passe',
+                        'class' => 'form-control'
+                    ],
+                    'constraints' => [
+                        new NotBlank([
+                            'message' => 'Veuillez entrer un nouveau mot de passe',
+                        ]),
+                        new Length([
+                            'min' => 8,
+                            'minMessage' => 'Votre mot de passe doit contenir au moins {{ limit }} caractères',
+                            'max' => 4096,
+                        ]),
+                        new Regex([
+                            'pattern' => '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/',
+                            'message' => 'Le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre',
+                        ]),
+                    ],
+                ],
+                'second_options' => [
+                    'label' => 'Confirmer le nouveau mot de passe',
+                    'attr' => [
+                        'placeholder' => 'Confirmez votre nouveau mot de passe',
+                        'class' => 'form-control'
+                    ],
+                ],
+            ]);
+    }
+
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            // Configure your form options here
+        ]);
+    }
+}

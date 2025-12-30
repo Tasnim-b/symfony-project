@@ -46,16 +46,24 @@
                 <!-- Profil Utilisateur -->
                 <div class="user-profile-dropdown">
                     <div class="user-avatar" id="userMenuTrigger">
-                        <img src="{{ asset('assets/images/default-avatar.jpg') }}" alt="Photo de profil" class="profile-img">
+                        {% if user.profileImage %}
+                            <img src="{{ asset('uploads/profile_images/' ~ user.profileImage) }}" alt="Photo de profil" class="profile-img" onerror="this.src='{{ asset('assets/images/default-avatar.jpg') }}'">
+                        {% else %}
+                            <img src="{{ asset('assets/images/default-avatar.jpg') }}" alt="Photo de profil" class="profile-img">
+                        {% endif %}
                         <i class="fas fa-chevron-down"></i>
                     </div>
 
                     <div class="dropdown-menu" id="userMenu">
                         <div class="user-info">
-                            <img src="{{ asset('assets/images/default-avatar.jpg') }}" alt="Photo de profil" class="menu-profile-img">
+                            {% if user.profileImage %}
+                                <img src="{{ asset('uploads/profile_images/' ~ user.profileImage) }}" alt="Photo de profil" class="menu-profile-img" onerror="this.src='{{ asset('assets/images/default-avatar.jpg') }}'">
+                            {% else %}
+                                <img src="{{ asset('assets/images/default-avatar.jpg') }}" alt="Photo de profil" class="menu-profile-img">
+                            {% endif %}
                             <div class="user-details">
-                                <h4>John Doe</h4>
-                                <p>Membre Premium</p>
+                                <h4>{{ user.fullName }}</h4>
+                                <p>Membre {% if 'ROLE_PREMIUM' in user.roles %}Premium{% else %}Standard{% endif %}</p>
                             </div>
                         </div>
 
@@ -66,9 +74,9 @@
                             <span>Mon Profil</span>
                         </a>
 
-                        <a href="#" class="dropdown-item">
-                            <i class="fas fa-cog"></i>
-                            <span>Paramètres</span>
+                        <a href="{{ path('app_dashboard') }}" class="dropdown-item">
+                             <i class="fas fa-tachometer-alt"></i>
+                             <span>Tableau de bord</span>
                         </a>
 
                         <a href="#" class="dropdown-item">
@@ -78,10 +86,13 @@
 
                         <div class="dropdown-divider"></div>
 
-                        <a href="#" class="dropdown-item logout">
-                            <i class="fas fa-sign-out-alt"></i>
-                            <span>Déconnexion</span>
-                        </a>
+                        <form action="{{ path('app_logout') }}" method="POST" style="display: inline;">
+                            <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
+                            <button type="submit" class="dropdown-item logout" style="background: none; border: none; width: 100%; text-align: left; cursor: pointer;">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Déconnexion</span>
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -89,6 +100,7 @@
 
         <!-- Sidebar -->
         <aside class="dashboard-sidebar">
+
             <div class="sidebar-header">
                 <h3><i class="fas fa-bars"></i> Menu</h3>
                 <button class="sidebar-toggle" id="sidebarToggle">
@@ -97,7 +109,7 @@
             </div>
 
             <nav class="sidebar-menu">
-                <a href="{{ path('app_dashboard') }}" class="menu-item">
+                <a href="{{ path('app_dashboard') }}" class="menu-item active">
                     <i class="fas fa-tachometer-alt"></i>
                     <span>Tableau de bord</span>
                 </a>
@@ -135,10 +147,10 @@
                         <span>Nutritionniste expert</span>
                     </a>
 
-                    <a href="#" class="menu-item">
+                    <a href="{{ path('app_communaute') }}" class="menu-item">
                         <i class="fas fa-users"></i>
                         <span>Communauté</span>
-                        <span class="badge">24</span>
+                        <span class="badge">{{ getTotalUsers() }}</span>
                     </a>
 
                     <a href="#" class="menu-item">
@@ -203,6 +215,7 @@
                     Passer à Premium
                 </button>
             </div>
+
         </aside>
 
         <!-- Contenu principal - Section Profil -->
@@ -212,6 +225,19 @@
                 <div class="profile-header">
                     <h2><i class="fas fa-user-circle"></i> Mon Profil</h2>
                     <p>Gérez vos informations personnelles</p>
+
+                    <!-- Messages Flash -->
+                    {% for message in app.flashes('success') %}
+                        <div class="alert alert-success" style="margin-top: 20px;">
+                            <i class="fas fa-check-circle"></i> {{ message }}
+                        </div>
+                    {% endfor %}
+
+                    {% for message in app.flashes('error') %}
+                        <div class="alert alert-error" style="margin-top: 20px;">
+                            <i class="fas fa-exclamation-circle"></i> {{ message }}
+                        </div>
+                    {% endfor %}
                 </div>
 
                 <!-- Grille de contenu du profil -->
@@ -227,36 +253,76 @@
 
                         <div class="profile-avatar-section">
                             <div class="avatar-container">
-                                <img src="{{ asset('images/default-avatar.jpg') }}" alt="Photo de profil" class="profile-avatar" id="profileAvatar">
+                                {% if user.profileImage %}
+                                    <img src="{{ asset('uploads/profile_images/' ~ user.profileImage) }}" alt="Photo de profil" class="profile-avatar" id="profileAvatar" onerror="this.src='{{ asset('assets/images/default-avatar.jpg') }}'">
+                                {% else %}
+                                    <img src="{{ asset('assets/images/default-avatar.jpg') }}" alt="Photo de profil" class="profile-avatar" id="profileAvatar">
+                                {% endif %}
                                 <div class="avatar-overlay" id="avatarOverlay">
                                     <i class="fas fa-camera"></i>
                                     <span>Changer la photo</span>
                                 </div>
-                                <input type="file" id="avatarInput" accept="image/*" style="display: none;">
                             </div>
                             <div class="avatar-info">
-                                <h4 id="displayFullName">John Doe</h4>
-                                <p class="user-role">Membre Premium</p>
-                                <p class="user-join">Membre depuis: Octobre 2023</p>
+                                <h4 id="displayFullName">{{ user.fullName }}</h4>
+                                <p class="user-role">Membre {% if 'ROLE_PREMIUM' in user.roles %}Premium{% else %}Standard{% endif %}</p>
+                                <p class="user-join">Membre depuis: {{ user.createdAt ? user.createdAt|date('F Y') : 'Date inconnue' }}</p>
                             </div>
                         </div>
 
-                        <form class="profile-form" id="profileForm">
+                        <!-- Formulaire de modification du profil -->
+                        {{ form_start(profileForm, {
+                            'attr': {
+                                'class': 'profile-form',
+                                'id': 'profileForm',
+                                'enctype': 'multipart/form-data'
+                            }
+                        }) }}
+
                             <div class="form-group">
-                                <label for="fullName"><i class="fas fa-user"></i> Nom Complet</label>
-                                <input type="text" id="fullName" name="fullName" value="John Doe" disabled>
+                                <label for="{{ profileForm.fullName.vars.id }}">
+                                    <i class="fas fa-user"></i> Nom Complet
+                                </label>
+                                {{ form_widget(profileForm.fullName, {
+                                    'attr': {
+                                        'disabled': true,
+                                        'class': 'form-control'
+                                    }
+                                }) }}
+                                {{ form_errors(profileForm.fullName) }}
                             </div>
 
                             <div class="form-group">
-                                <label for="email"><i class="fas fa-envelope"></i> Adresse Email</label>
-                                <input type="email" id="email" name="email" value="john.doe@example.com" disabled>
+                                <label for="{{ profileForm.email.vars.id }}">
+                                    <i class="fas fa-envelope"></i> Adresse Email
+                                </label>
+                                {{ form_widget(profileForm.email, {
+                                    'attr': {
+                                        'disabled': true,
+                                        'class': 'form-control'
+                                    }
+                                }) }}
+                                {{ form_errors(profileForm.email) }}
+                            </div>
+
+                            <!-- Champ caché pour l'image -->
+                            <div class="form-group" style="display: none;">
+                                {{ form_widget(profileForm.profileImage, {
+                                    'attr': {
+                                        'id': 'avatarInput'
+                                    }
+                                }) }}
+                                {{ form_errors(profileForm.profileImage) }}
                             </div>
 
                             <div class="form-actions" id="formActions" style="display: none;">
                                 <button type="button" class="btn-cancel" id="cancelBtn">Annuler</button>
-                                <button type="submit" class="btn-save">Enregistrer</button>
+                                <button type="submit" class="btn-save">
+                                    <i class="fas fa-save"></i> Enregistrer
+                                </button>
                             </div>
-                        </form>
+
+                        {{ form_end(profileForm) }}
                     </div>
 
                     <!-- Colonne droite : Changer le mot de passe -->
@@ -265,57 +331,60 @@
                             <h3><i class="fas fa-key"></i> Changer le mot de passe</h3>
                         </div>
 
-                        <form class="password-form" id="passwordForm">
+                        <!-- Formulaire de changement de mot de passe -->
+                        {{ form_start(passwordForm, {
+                            'attr': {
+                                'class': 'password-form',
+                                'id': 'passwordForm'
+                            }
+                        }) }}
+
                             <div class="form-group">
-                                <label for="currentPassword">Mot de passe actuel</label>
-                                <div class="password-input">
-                                    <input type="password" id="currentPassword" name="currentPassword" required>
-                                    <button type="button" class="toggle-password">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                </div>
+                                <label for="{{ passwordForm.oldPassword.vars.id }}">
+                                    <i class="fas fa-lock"></i> Mot de passe actuel
+                                </label>
+                                {{ form_widget(passwordForm.oldPassword, {
+                                    'attr': {
+                                        'class': 'form-control',
+                                        'placeholder': 'Votre mot de passe actuel'
+                                    }
+                                }) }}
+                                {{ form_errors(passwordForm.oldPassword) }}
                             </div>
 
                             <div class="form-group">
-                                <label for="newPassword">Nouveau mot de passe</label>
-                                <div class="password-input">
-                                    <input type="password" id="newPassword" name="newPassword" required>
-                                    <button type="button" class="toggle-password">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                </div>
-                                <div class="password-strength">
-                                    <div class="strength-bar"></div>
-                                    <span class="strength-text">Force du mot de passe</span>
-                                </div>
+                                <label for="{{ passwordForm.newPassword.first.vars.id }}">
+                                    <i class="fas fa-key"></i> Nouveau mot de passe
+                                </label>
+                                {{ form_widget(passwordForm.newPassword.first, {
+                                    'attr': {
+                                        'class': 'form-control',
+                                        'placeholder': 'Votre nouveau mot de passe'
+                                    }
+                                }) }}
+                                {{ form_errors(passwordForm.newPassword.first) }}
                             </div>
 
                             <div class="form-group">
-                                <label for="confirmPassword">Confirmer le mot de passe</label>
-                                <div class="password-input">
-                                    <input type="password" id="confirmPassword" name="confirmPassword" required>
-                                    <button type="button" class="toggle-password">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                </div>
-                                <div class="password-match" id="passwordMatch"></div>
-                            </div>
-
-                            <div class="password-requirements">
-                                <p><strong>Le mot de passe doit contenir :</strong></p>
-                                <ul>
-                                    <li id="reqLength">Au moins 8 caractères</li>
-                                    <li id="reqUpper">Une lettre majuscule</li>
-                                    <li id="reqLower">Une lettre minuscule</li>
-                                    <li id="reqNumber">Un chiffre</li>
-                                    <li id="reqSpecial">Un caractère spécial</li>
-                                </ul>
+                                <label for="{{ passwordForm.newPassword.second.vars.id }}">
+                                    <i class="fas fa-key"></i> Confirmer le mot de passe
+                                </label>
+                                {{ form_widget(passwordForm.newPassword.second, {
+                                    'attr': {
+                                        'class': 'form-control',
+                                        'placeholder': 'Confirmez votre nouveau mot de passe'
+                                    }
+                                }) }}
+                                {{ form_errors(passwordForm.newPassword.second) }}
                             </div>
 
                             <div class="form-actions">
-                                <button type="submit" class="btn-save">Mettre à jour le mot de passe</button>
+                                <button type="submit" class="btn-save">
+                                    <i class="fas fa-sync-alt"></i> Mettre à jour le mot de passe
+                                </button>
                             </div>
-                        </form>
+
+                        {{ form_end(passwordForm) }}
                     </div>
                 </div>
             </div>
@@ -323,6 +392,144 @@
     </div>
 
     <!-- JavaScript -->
-    <script src="{{ asset('js/profile.js') }}"></script>
+
+    <script >
+         document.addEventListener('DOMContentLoaded', function() {
+            // Gestion du menu dropdown utilisateur
+            const userMenuTrigger = document.getElementById('userMenuTrigger');
+            const userMenu = document.getElementById('userMenu');
+
+            if (userMenuTrigger && userMenu) {
+                userMenuTrigger.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    userMenu.classList.toggle('show');
+                });
+
+                // Fermer le menu quand on clique ailleurs
+                document.addEventListener('click', function() {
+                    userMenu.classList.remove('show');
+                });
+            }
+
+            // Gestion de l'édition du profil
+            const editProfileBtn = document.getElementById('editProfileBtn');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const profileForm = document.getElementById('profileForm');
+            const formActions = document.getElementById('formActions');
+            const avatarOverlay = document.getElementById('avatarOverlay');
+            const avatarInput = document.getElementById('avatarInput');
+            const profileAvatar = document.getElementById('profileAvatar');
+
+            if (editProfileBtn) {
+                editProfileBtn.addEventListener('click', function() {
+                    // Activer les champs
+                    const inputs = profileForm.querySelectorAll('input');
+                    inputs.forEach(input => {
+                        input.disabled = false;
+                    });
+
+                    // Afficher les boutons d'actions
+                    formActions.style.display = 'flex';
+
+                    // Cacher le bouton Modifier
+                    this.style.display = 'none';
+                });
+            }
+
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', function() {
+                    // Recharger la page pour annuler les modifications
+                    window.location.reload();
+                });
+            }
+
+            // Gestion du changement d'avatar
+            if (avatarOverlay && avatarInput) {
+                avatarOverlay.addEventListener('click', function() {
+                    avatarInput.click();
+                });
+
+                avatarInput.addEventListener('change', function(e) {
+                    if (e.target.files && e.target.files[0]) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            profileAvatar.src = e.target.result;
+                        };
+                        reader.readAsDataURL(e.target.files[0]);
+                    }
+                });
+            }
+
+            // Gestion des toggles de mot de passe
+            const toggleButtons = document.querySelectorAll('.toggle-password');
+            toggleButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const input = this.parentElement.querySelector('input');
+                    const icon = this.querySelector('i');
+
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        icon.classList.remove('fa-eye');
+                        icon.classList.add('fa-eye-slash');
+                    } else {
+                        input.type = 'password';
+                        icon.classList.remove('fa-eye-slash');
+                        icon.classList.add('fa-eye');
+                    }
+                });
+            });
+
+            // Validation du mot de passe en temps réel
+            const newPasswordInput = document.getElementById('{{ passwordForm.newPassword.first.vars.id }}');
+            const confirmPasswordInput = document.getElementById('{{ passwordForm.newPassword.second.vars.id }}');
+
+            if (newPasswordInput && confirmPasswordInput) {
+                newPasswordInput.addEventListener('input', validatePassword);
+                confirmPasswordInput.addEventListener('input', validatePassword);
+
+                function validatePassword() {
+                    const newPassword = newPasswordInput.value;
+                    const confirmPassword = confirmPasswordInput.value;
+
+                    // Validation de la force du mot de passe
+                    const hasMinLength = newPassword.length >= 8;
+                    const hasUpperCase = /[A-Z]/.test(newPassword);
+                    const hasLowerCase = /[a-z]/.test(newPassword);
+                    const hasNumbers = /\d/.test(newPassword);
+                    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(newPassword);
+
+                    // Mettre à jour les indicateurs visuels
+                    updateRequirement('reqLength', hasMinLength);
+                    updateRequirement('reqUpper', hasUpperCase);
+                    updateRequirement('reqLower', hasLowerCase);
+                    updateRequirement('reqNumber', hasNumbers);
+                    updateRequirement('reqSpecial', hasSpecialChar);
+
+                    // Vérifier si les mots de passe correspondent
+                    const matchElement = document.getElementById('passwordMatch');
+                    if (matchElement) {
+                        if (confirmPassword && newPassword !== confirmPassword) {
+                            matchElement.textContent = 'Les mots de passe ne correspondent pas';
+                            matchElement.style.color = '#f44336';
+                        } else if (confirmPassword) {
+                            matchElement.textContent = 'Les mots de passe correspondent';
+                            matchElement.style.color = '#4caf50';
+                        } else {
+                            matchElement.textContent = '';
+                        }
+                    }
+                }
+
+                function updateRequirement(elementId, isValid) {
+                    const element = document.getElementById(elementId);
+                    if (element) {
+                        element.style.color = isValid ? '#4caf50' : '#757575';
+                        element.style.fontWeight = isValid ? 'bold' : 'normal';
+                    }
+                }
+            }
+        });
+
+    </script>
 </body>
 </html>

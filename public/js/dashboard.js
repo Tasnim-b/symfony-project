@@ -20,13 +20,20 @@ document.addEventListener('DOMContentLoaded', function() {
 function initCharts() {
     // Graphique de progression
     const progressCtx = document.getElementById('progressChart').getContext('2d');
+    const progressCanvas = document.getElementById('progressChart');
+
+    // Récupérer les données depuis les attributs data
+    const labels = JSON.parse(progressCanvas.dataset.labels);
+    const caloriesData = JSON.parse(progressCanvas.dataset.calories);
+    const distanceData = JSON.parse(progressCanvas.dataset.distance);
+
     const progressChart = new Chart(progressCtx, {
         type: 'line',
         data: {
-            labels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
+            labels: labels,
             datasets: [{
                 label: 'Calories brûlées',
-                data: [1200, 1900, 1500, 2100, 1800, 2300, 1950],
+                data: caloriesData,
                 borderColor: '#2e7d32',
                 backgroundColor: 'rgba(46, 125, 50, 0.1)',
                 borderWidth: 3,
@@ -34,7 +41,7 @@ function initCharts() {
                 tension: 0.4
             }, {
                 label: 'Distance (km)',
-                data: [3, 5, 4, 6, 5, 7, 6],
+                data: distanceData,
                 borderColor: '#2196f3',
                 backgroundColor: 'rgba(33, 150, 243, 0.1)',
                 borderWidth: 3,
@@ -68,12 +75,19 @@ function initCharts() {
 
     // Graphique des calories
     const caloriesCtx = document.getElementById('caloriesChart').getContext('2d');
+    const caloriesCanvas = document.getElementById('caloriesChart');
+
+    // Récupérer les données depuis les attributs data
+    const proteins = parseInt(caloriesCanvas.dataset.proteins);
+    const carbs = parseInt(caloriesCanvas.dataset.carbs);
+    const fats = parseInt(caloriesCanvas.dataset.fats);
+
     const caloriesChart = new Chart(caloriesCtx, {
         type: 'doughnut',
         data: {
             labels: ['Protéines', 'Glucides', 'Lipides'],
             datasets: [{
-                data: [35, 45, 20],
+                data: [proteins, carbs, fats],
                 backgroundColor: [
                     '#4CAF50',
                     '#2196F3',

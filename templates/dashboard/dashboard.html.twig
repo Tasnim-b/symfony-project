@@ -47,29 +47,47 @@
                 <!-- Profil Utilisateur -->
                 <div class="user-profile-dropdown">
                     <div class="user-avatar" id="userMenuTrigger">
-                        <img src="{{ asset('assets/images/default-avatar.jpg') }}" alt="Photo de profil" class="profile-img">
+                        {% if user.profileImage %}
+                            <img src="{{ asset('uploads/profile_images/' ~ user.profileImage) }}"
+                                alt="Photo de profil"
+                                class="profile-img"
+                                onerror="this.src='{{ asset('assets/images/default-avatar.jpg') }}'">
+                        {% else %}
+                            <img src="{{ asset('assets/images/default-avatar.jpg') }}"
+                                alt="Photo de profil"
+                                class="profile-img">
+                        {% endif %}
                         <i class="fas fa-chevron-down"></i>
                     </div>
 
                     <div class="dropdown-menu" id="userMenu">
                         <div class="user-info">
-                            <img src="{{ asset('assets/images/default-avatar.jpg') }}" alt="Photo de profil" class="menu-profile-img">
+                            {% if user.profileImage %}
+                                <img src="{{ asset('uploads/profile_images/' ~ user.profileImage) }}"
+                                    alt="Photo de profil"
+                                    class="menu-profile-img"
+                                    onerror="this.src='{{ asset('assets/images/default-avatar.jpg') }}'">
+                            {% else %}
+                                <img src="{{ asset('assets/images/default-avatar.jpg') }}"
+                                    alt="Photo de profil"
+                                    class="menu-profile-img">
+                            {% endif %}
                             <div class="user-details">
-                                <h4>John Doe</h4>
-                                <p>Membre Premium</p>
+                                <h4>{{ user.fullName }}</h4>
+                                <p>Membre {% if 'ROLE_PREMIUM' in user.roles %}Premium{% else %}Standard{% endif %}</p>
                             </div>
                         </div>
 
                         <div class="dropdown-divider"></div>
 
-                        <a href="#" class="dropdown-item">
+                        <a href="{{ path('app_profil') }}" class="dropdown-item">
                             <i class="fas fa-user-circle"></i>
                             <span>Mon Profil</span>
                         </a>
 
-                        <a href="#" class="dropdown-item">
-                            <i class="fas fa-cog"></i>
-                            <span>Paramètres</span>
+                        <a href="{{ path('app_dashboard') }}" class="dropdown-item active">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Tableau de bord</span>
                         </a>
 
                         <a href="#" class="dropdown-item">
@@ -80,13 +98,13 @@
                         <div class="dropdown-divider"></div>
 
                         <!-- FORMULAIRE DE DÉCONNEXION (POST avec CSRF) -->
-                            <form action="{{ path('app_logout') }}" method="POST" class="logout-form">
-                                <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
-                                <button type="submit" class="dropdown-item logout">
-                                    <i class="fas fa-sign-out-alt"></i>
-                                    <span>Déconnexion</span>
-                                </button>
-                            </form>
+                        <form action="{{ path('app_logout') }}" method="POST" class="logout-form">
+                            <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
+                            <button type="submit" class="dropdown-item logout">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Déconnexion</span>
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -140,10 +158,10 @@
                         <span>Nutritionniste expert</span>
                     </a>
 
-                    <a href="#" class="menu-item">
+                    <a href="{{ path('app_communaute') }}" class="menu-item">
                         <i class="fas fa-users"></i>
                         <span>Communauté</span>
-                        <span class="badge">24</span>
+                        <span class="badge">{{ getTotalUsers() }}</span>
                     </a>
 
                     <a href="#" class="menu-item">
@@ -215,27 +233,27 @@
             <!-- Cartes de bienvenue et stats rapides -->
             <div class="welcome-section">
                 <div class="welcome-card">
-                    <h2>Bonjour, <span class="user-name">John</span> 👋</h2>
-                    <p>Vous avez complété 8 entraînements cette semaine. Continuez comme ça !</p>
+                    <h2>Bonjour, <span class="user-name">{{ user.fullName }}</span> 👋</h2>
+                    <p>Vous avez complété {{ dashboard.quick_stats.workouts_this_week }} entraînements cette semaine. Continuez comme ça !</p>
                     <div class="welcome-stats">
                         <div class="stat">
                             <i class="fas fa-fire"></i>
                             <div>
-                                <h4>1,250</h4>
+                                <h4>{{ dashboard.quick_stats.calories_burned|number_format(0, ',', ' ') }}</h4>
                                 <span>Calories brûlées</span>
                             </div>
                         </div>
                         <div class="stat">
                             <i class="fas fa-running"></i>
                             <div>
-                                <h4>28km</h4>
+                                <h4>{{ dashboard.quick_stats.distance }}km</h4>
                                 <span>Distance parcourue</span>
                             </div>
                         </div>
                         <div class="stat">
                             <i class="fas fa-heartbeat"></i>
                             <div>
-                                <h4>72</h4>
+                                <h4>{{ dashboard.quick_stats.avg_bpm }}</h4>
                                 <span>BPM moyenne</span>
                             </div>
                         </div>
@@ -245,12 +263,18 @@
                 <div class="date-card">
                     <h3><i class="fas fa-calendar-day"></i> Aujourd'hui</h3>
                     <div class="current-date">
-                        <div class="date-day">15</div>
-                        <div class="date-month">Octobre 2024</div>
+                        <div class="date-day">{{ "now"|date("d") }}</div>
+                        <div class="date-month">{{ "now"|date("F Y") }}</div>
                     </div>
                     <div class="next-workout">
-                        <p>Prochain entraînement: <strong>Cardio (18:00)</strong></p>
-                        <button class="btn-start">Commencer</button>
+                        {% set nextWorkout = dashboard.workouts|filter(w => w.status == 'pending')|first %}
+                        {% if nextWorkout %}
+                            <p>Prochain entraînement: <strong>{{ nextWorkout.name }} ({{ nextWorkout.time }})</strong></p>
+                            <button class="btn-start">Commencer</button>
+                        {% else %}
+                            <p>Aucun entraînement prévu aujourd'hui</p>
+                            <button class="btn-start">Planifier</button>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -267,7 +291,11 @@
                         </select>
                     </div>
                     <div class="chart-container">
-                        <canvas id="progressChart"></canvas>
+                        <canvas id="progressChart"
+                                data-labels="{{ dashboard.weekly_progress.labels|json_encode }}"
+                                data-calories="{{ dashboard.weekly_progress.calories|json_encode }}"
+                                data-distance="{{ dashboard.weekly_progress.distance|json_encode }}">
+                        </canvas>
                     </div>
                 </div>
 
@@ -275,13 +303,17 @@
                     <div class="chart-header">
                         <h3>Répartition des calories</h3>
                         <div class="chart-legend">
-                            <span class="legend-item"><i class="fas fa-circle" style="color: #4CAF50;"></i> Protéines</span>
-                            <span class="legend-item"><i class="fas fa-circle" style="color: #2196F3;"></i> Glucides</span>
-                            <span class="legend-item"><i class="fas fa-circle" style="color: #FF9800;"></i> Lipides</span>
+                            <span class="legend-item"><i class="fas fa-circle" style="color: #4CAF50;"></i> Protéines ({{ dashboard.nutrition.proteins }}%)</span>
+                            <span class="legend-item"><i class="fas fa-circle" style="color: #2196F3;"></i> Glucides ({{ dashboard.nutrition.carbs }}%)</span>
+                            <span class="legend-item"><i class="fas fa-circle" style="color: #FF9800;"></i> Lipides ({{ dashboard.nutrition.fats }}%)</span>
                         </div>
                     </div>
                     <div class="chart-container">
-                        <canvas id="caloriesChart"></canvas>
+                        <canvas id="caloriesChart"
+                                data-proteins="{{ dashboard.nutrition.proteins }}"
+                                data-carbs="{{ dashboard.nutrition.carbs }}"
+                                data-fats="{{ dashboard.nutrition.fats }}">
+                        </canvas>
                     </div>
                 </div>
             </div>
@@ -295,47 +327,43 @@
                     </div>
 
                     <div class="workout-list">
-                        <div class="workout-item">
-                            <div class="workout-icon">
-                                <i class="fas fa-running"></i>
+                        {% for workout in dashboard.workouts %}
+                            <div class="workout-item">
+                                <div class="workout-icon">
+                                    {% if workout.name == 'Cardio Training' %}
+                                        <i class="fas fa-running"></i>
+                                    {% elseif workout.name == 'Musculation' %}
+                                        <i class="fas fa-dumbbell"></i>
+                                    {% elseif workout.name == 'Natation' %}
+                                        <i class="fas fa-water"></i>
+                                    {% else %}
+                                        <i class="fas fa-dumbbell"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="workout-details">
+                                    <h4>{{ workout.name }}</h4>
+                                    <p>{{ workout.duration }} min •
+                                    {% if workout.calories is defined %}
+                                        Brûle {{ workout.calories }} calories
+                                    {% elseif workout.type is defined %}
+                                        {{ workout.type }}
+                                    {% endif %}
+                                    </p>
+                                </div>
+                                <div class="workout-status {{ workout.status }}">
+                                    {% if workout.status == 'completed' %}
+                                        <i class="fas fa-check"></i>
+                                        Terminé
+                                    {% elseif workout.status == 'pending' %}
+                                        <i class="fas fa-clock"></i>
+                                        {{ workout.time }}
+                                    {% elseif workout.status == 'upcoming' %}
+                                        <i class="fas fa-calendar"></i>
+                                        {{ workout.time }}
+                                    {% endif %}
+                                </div>
                             </div>
-                            <div class="workout-details">
-                                <h4>Cardio Training</h4>
-                                <p>30 min • Brûle 300 calories</p>
-                            </div>
-                            <div class="workout-status completed">
-                                <i class="fas fa-check"></i>
-                                Terminé
-                            </div>
-                        </div>
-
-                        <div class="workout-item">
-                            <div class="workout-icon">
-                                <i class="fas fa-dumbbell"></i>
-                            </div>
-                            <div class="workout-details">
-                                <h4>Musculation</h4>
-                                <p>45 min • Haut du corps</p>
-                            </div>
-                            <div class="workout-status pending">
-                                <i class="fas fa-clock"></i>
-                                18:00
-                            </div>
-                        </div>
-
-                        <div class="workout-item">
-                            <div class="workout-icon">
-                                <i class="fas fa-water"></i>
-                            </div>
-                            <div class="workout-details">
-                                <h4>Natation</h4>
-                                <p>40 min • Endurance</p>
-                            </div>
-                            <div class="workout-status upcoming">
-                                <i class="fas fa-calendar"></i>
-                                Demain
-                            </div>
-                        </div>
+                        {% endfor %}
                     </div>
                 </div>
 
@@ -346,49 +374,22 @@
                     </div>
 
                     <div class="meal-list">
-                        <div class="meal-item">
-                            <div class="meal-time">Petit-déjeuner</div>
-                            <div class="meal-details">
-                                <h4>Smoothie protéiné</h4>
-                                <p>350 kcal • 25g protéines</p>
+                        {% for meal in dashboard.meals %}
+                            <div class="meal-item">
+                                <div class="meal-time">{{ meal.time }}</div>
+                                <div class="meal-details">
+                                    <h4>{{ meal.name }}</h4>
+                                    <p>{{ meal.calories }} kcal • {{ meal.proteins }}g protéines</p>
+                                </div>
+                                <div class="meal-check">
+                                    {% if meal.completed %}
+                                        <i class="fas fa-check-circle" style="color: #2e7d32;"></i>
+                                    {% else %}
+                                        <i class="far fa-circle"></i>
+                                    {% endif %}
+                                </div>
                             </div>
-                            <div class="meal-check">
-                                <i class="fas fa-check-circle"></i>
-                            </div>
-                        </div>
-
-                        <div class="meal-item">
-                            <div class="meal-time">Déjeuner</div>
-                            <div class="meal-details">
-                                <h4>Poulet et quinoa</h4>
-                                <p>450 kcal • 35g protéines</p>
-                            </div>
-                            <div class="meal-check">
-                                <i class="fas fa-check-circle"></i>
-                            </div>
-                        </div>
-
-                        <div class="meal-item">
-                            <div class="meal-time">Dîner</div>
-                            <div class="meal-details">
-                                <h4>Saumon et légumes</h4>
-                                <p>400 kcal • 30g protéines</p>
-                            </div>
-                            <div class="meal-check">
-                                <i class="far fa-circle"></i>
-                            </div>
-                        </div>
-
-                        <div class="meal-item">
-                            <div class="meal-time">Collation</div>
-                            <div class="meal-details">
-                                <h4>Yaourt grec</h4>
-                                <p>150 kcal • 15g protéines</p>
-                            </div>
-                            <div class="meal-check">
-                                <i class="far fa-circle"></i>
-                            </div>
-                        </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
@@ -530,6 +531,6 @@
     </div>
 
     <!-- JavaScript -->
-    <script src="{{ asset('assets/js/dashboard.js') }}"></script>
+    <script src="{{ asset('js/dashboard.js') }}"></script>
 </body>
 </html>
