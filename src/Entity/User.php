@@ -7,6 +7,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
@@ -53,11 +55,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'boolean')]
     private bool $isVerified = false;
 
+
+//relation avec les messages
+    #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'sender')]
+    private Collection $sentMessages;
+
+    #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'receiver')]
+    private Collection $receivedMessages;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = new \DateTimeImmutable();
         $this->roles = ['ROLE_USER'];
+        $this->sentMessages = new ArrayCollection();
+        $this->receivedMessages = new ArrayCollection();
     }
 
     // Getters et Setters pour les nouveaux champs
@@ -193,6 +205,32 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // Image par défaut
         return '/images/default-avatar.png';
     }
+
+
+    // Ajoutez ces getters/setters
+public function getSentMessages(): Collection
+{
+    return $this->sentMessages;
+}
+
+public function setSentMessages(Collection $sentMessages): void
+{
+    $this->sentMessages = $sentMessages;
+}
+
+public function getReceivedMessages(): Collection
+{
+    return $this->receivedMessages;
+}
+
+public function setReceivedMessages(Collection $receivedMessages): void
+{
+    $this->receivedMessages = $receivedMessages;
+}
+
+
+
+
 }
 
 

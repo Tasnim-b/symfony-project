@@ -69,4 +69,5 @@ security:
         - { path: ^/dashboard, roles: ROLE_USER }
         - { path: ^/profil, roles: ROLE_USER }
         - { path: ^/communaute, roles: ROLE_USER }
+        - { path: ^/messagerie, roles: ROLE_USER }
         - { path: ^/admin, roles: ROLE_ADMIN }
