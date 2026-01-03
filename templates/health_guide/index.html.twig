@@ -1,0 +1,690 @@
+{# templates/health_guide/index.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    <style>
+        :root {
+            --primary: #2e7d32;
+            --primary-light: #4caf50;
+            --primary-dark: #1b5e20;
+            --secondary: #ff9800;
+            --accent: #2196f3;
+            --light: #f8f9fa;
+            --dark: #212121;
+            --gray: #757575;
+            --light-gray: #f5f5f5;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+            --transition: all 0.3s ease;
+            --danger: #f44336;
+            --danger-dark: #d32f2f;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            line-height: 1.6;
+            color: var(--dark);
+            overflow-x: hidden;
+            background-color: var(--light);
+        }
+
+        .back-to-dashboard {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: white;
+            color: var(--primary);
+            padding: 12px 25px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: var(--transition);
+        }
+
+        .back-to-dashboard:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+            background: var(--primary);
+            color: white;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .articles-header {
+            background: linear-gradient(rgba(46, 125, 50, 0.9), rgba(27, 94, 32, 0.9)),
+            url('https://images.unsplash.com/photo-1490818387583-1baba5e638af?ixlib=rb-4.0.3&auto=format&fit=crop&w=1932&q=80')
+            no-repeat center center/cover;
+            padding: 140px 0 60px;
+            color: white;
+            text-align: center;
+            margin-bottom: 60px;
+            position: relative;
+        }
+
+        .page-title {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .page-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .btn-ajouter {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--primary);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-ajouter:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+            background: var(--primary-dark);
+        }
+
+        .alert-message {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 5px;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            animation: slideIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-success {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .alert-error {
+            background: #f44336;
+            color: white;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .articles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .article-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            animation: fadeInUp 0.6s ease-out;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .article-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header {
+            position: relative;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .article-category {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--secondary);
+            color: white;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            box-shadow: 0 3px 10px rgba(255, 152, 0, 0.3);
+        }
+
+        .btn-supprimer {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: var(--danger);
+            color: white;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            z-index: 10;
+            opacity: 0.9;
+            text-decoration: none;
+        }
+
+        .btn-supprimer:hover {
+            background: var(--danger-dark);
+            transform: scale(1.1);
+            opacity: 1;
+        }
+
+        .btn-edit {
+            position: absolute;
+            top: 60px;
+            left: 15px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            z-index: 10;
+            opacity: 0.9;
+            text-decoration: none;
+        }
+
+        .btn-edit:hover {
+            background: #1976d2;
+            transform: scale(1.1);
+            opacity: 1;
+        }
+
+        .card-body {
+            padding: 25px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .article-title {
+            color: var(--primary-dark);
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .article-meta {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .article-excerpt {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            line-height: 1.6;
+            height: 60px;
+            overflow: hidden;
+        }
+
+        .article-stats {
+            background: var(--light-gray);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .stats-label {
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .stats-details {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .stats-details div {
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .read-more {
+            background: var(--primary);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            text-align: center;
+            margin-top: 20px;
+            transition: var(--transition);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .read-more:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .external-link-icon {
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 2.2rem;
+            }
+
+            .articles-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .back-to-dashboard, .btn-ajouter {
+                top: 15px;
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+
+            .back-to-dashboard {
+                left: 15px;
+            }
+
+            .btn-ajouter {
+                right: 15px;
+            }
+
+            .articles-header {
+                padding-top: 120px !important;
+            }
+
+            .card-header {
+                height: 180px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .page-title {
+                font-size: 1.8rem;
+            }
+
+            .back-to-dashboard, .btn-ajouter {
+                top: 10px;
+                padding: 8px 15px;
+                font-size: 0.85rem;
+            }
+
+            .articles-header {
+                padding-top: 100px !important;
+            }
+
+            .card-header {
+                height: 160px;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="articles-page">
+        <!-- Bouton retour dashboard -->
+        <a href="{{ path('app_dashboard') }}" class="back-to-dashboard">
+            <i class="fas fa-arrow-left"></i>
+            Retour au Dashboard
+        </a>
+
+        <!-- Bouton Ajouter -->
+        <a href="{{ path('app_article_new') }}" class="btn-ajouter">
+            <i class="fas fa-plus"></i>
+            Nouvel Article
+        </a>
+
+        <!-- Messages flash -->
+        {% for message in app.flashes('success') %}
+            <div class="alert-message alert-success">
+                <i class="fas fa-check-circle"></i> {{ message }}
+            </div>
+        {% endfor %}
+
+        {% for message in app.flashes('error') %}
+            <div class="alert-message alert-error">
+                <i class="fas fa-exclamation-circle"></i> {{ message }}
+            </div>
+        {% endfor %}
+
+        <!-- En-tête de la page -->
+        <div class="articles-header">
+            <div class="container">
+                <h1 class="page-title">Guide Santé</h1>
+                <p class="page-subtitle">
+                    Articles et conseils santé pour votre bien-être quotidien
+                </p>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- Statistiques -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 40px 0;">
+                <div style="background: white; padding: 25px; border-radius: 15px; text-align: center; box-shadow: var(--shadow);">
+                    <div style="font-size: 2.5rem; font-weight: 700; color: var(--primary-dark); margin-bottom: 10px;">
+                        {{ articles|length }}
+                    </div>
+                    <div style="color: var(--gray); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">
+                        Articles
+                    </div>
+                </div>
+                <div style="background: white; padding: 25px; border-radius: 15px; text-align: center; box-shadow: var(--shadow);">
+                    <div style="font-size: 2.5rem; font-weight: 700; color: var(--primary-dark); margin-bottom: 10px;">
+                        {% set totalLikes = 0 %}
+                        {% for article in articles %}
+                            {% set totalLikes = totalLikes + article.likes %}
+                        {% endfor %}
+                        {{ totalLikes }}
+                    </div>
+                    <div style="color: var(--gray); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">
+                        Likes Totaux
+                    </div>
+                </div>
+                <div style="background: white; padding: 25px; border-radius: 15px; text-align: center; box-shadow: var(--shadow);">
+                    <div style="font-size: 2.5rem; font-weight: 700; color: var(--primary-dark); margin-bottom: 10px;">
+                        {% set totalComments = 0 %}
+                        {% for article in articles %}
+                            {% set totalComments = totalComments + article.comments %}
+                        {% endfor %}
+                        {{ totalComments }}
+                    </div>
+                    <div style="color: var(--gray); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">
+                        Commentaires
+                    </div>
+                </div>
+                <div style="background: white; padding: 25px; border-radius: 15px; text-align: center; box-shadow: var(--shadow);">
+                    <div style="font-size: 2.5rem; font-weight: 700; color: var(--primary-dark); margin-bottom: 10px;">
+                        {% set totalShares = 0 %}
+                        {% for article in articles %}
+                            {% set totalShares = totalShares + article.shares %}
+                        {% endfor %}
+                        {{ totalShares }}
+                    </div>
+                    <div style="color: var(--gray); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">
+                        Partages
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filtres -->
+            <div style="background: white; padding: 30px; border-radius: 15px; box-shadow: var(--shadow); margin-bottom: 40px;">
+                <h2 style="color: var(--primary-dark); font-size: 1.3rem; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-search" style="color: var(--secondary);"></i>
+                    Filtrer les articles
+                </h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 20px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--primary-dark); font-size: 0.9rem;">
+                            <i class="fas fa-tag"></i> Par catégorie
+                        </label>
+                        <select id="category" style="width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 0.95rem; transition: var(--transition); background: var(--light-gray);">
+                            <option value="">Toutes les catégories</option>
+                            <option value="Nutrition">Nutrition</option>
+                            <option value="Exercice">Exercice</option>
+                            <option value="Sommeil">Sommeil</option>
+                            <option value="Mental">Santé Mentale</option>
+                            <option value="Hydratation">Hydratation</option>
+                            <option value="Prévention">Prévention</option>
+                            <option value="Conseils">Conseils</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; color: var(--primary-dark); font-size: 0.9rem;">
+                            <i class="fas fa-user"></i> Par auteur
+                        </label>
+                        <select id="author" style="width: 100%; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 0.95rem; transition: var(--transition); background: var(--light-gray);">
+                            <option value="">Tous les auteurs</option>
+                            {% set authors = [] %}
+                            {% for article in articles %}
+                                {% if article.author not in authors %}
+                                    <option value="{{ article.author }}">{{ article.author }}</option>
+                                    {% set authors = authors|merge([article.author]) %}
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 15px; justify-content: flex-end;">
+                    <button onclick="resetFilters()" style="padding: 12px 30px; border: 2px solid var(--gray); border-radius: 25px; font-weight: 600; cursor: pointer; transition: var(--transition); font-size: 0.95rem; background: transparent; color: var(--gray);">
+                        <i class="fas fa-redo"></i> Réinitialiser
+                    </button>
+                    <button onclick="applyFilters()" style="padding: 12px 30px; border: none; border-radius: 25px; font-weight: 600; cursor: pointer; transition: var(--transition); font-size: 0.95rem; background: var(--secondary); color: white;">
+                        <i class="fas fa-filter"></i> Appliquer filtres
+                    </button>
+                </div>
+            </div>
+
+            <!-- Grille des articles -->
+            <div class="articles-grid">
+                {% for article in articles %}
+                    {% set isExternalUrl = article.content starts with 'http://' or article.content starts with 'https://' %}
+
+                    <div class="article-card"
+                         data-category="{{ article.category }}"
+                         data-author="{{ article.author }}"
+                         data-id="{{ article.id }}"
+                         style="--card-color: {{ random(['#4CAF50', '#2196F3', '#FF9800', '#9C27B0', '#E91E63', '#00BCD4']) }}">
+
+                        <div class="card-header" style="background: linear-gradient(135deg, var(--card-color), color-mix(in srgb, var(--card-color) 70%, black));">
+                            {% if article.image %}
+                                <img src="{{ article.image }}" alt="{{ article.title }}" style="width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0;">
+                            {% endif %}
+
+                            <span class="article-category">{{ article.category }}</span>
+
+                            <a href="{{ path('app_article_edit', {'id': article.id}) }}"
+                               class="btn-edit"
+                               title="Modifier l'article">
+                                <i class="fas fa-edit"></i>
+                            </a>
+
+                            <a href="{{ path('app_article_delete_get', {'id': article.id}) }}"
+                               class="btn-supprimer"
+                               onclick="return confirm('Voulez-vous vraiment supprimer cet article ?');"
+                               title="Supprimer l'article">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+
+                        <div class="card-body">
+                            <h3 class="article-title">{{ article.title }}</h3>
+
+                            <div class="article-meta">
+                                <span><i class="fas fa-user"></i> {{ article.author }}</span>
+                                <span><i class="fas fa-calendar"></i> {{ article.date|date('d/m/Y') }}</span>
+                                <span><i class="fas fa-clock"></i> {{ article.readTime }}</span>
+                            </div>
+
+                            <p class="article-excerpt">
+                                {{ article.excerpt }}
+                            </p>
+
+                            <div class="article-stats">
+                                <div class="stats-label">Engagement :</div>
+                                <div class="stats-details">
+                                    <div><i class="fas fa-heart" style="color: #f44336;"></i> {{ article.likes }} likes</div>
+                                    <div><i class="fas fa-comment" style="color: #2196F3;"></i> {{ article.comments }} commentaires</div>
+                                    <div><i class="fas fa-share" style="color: #4CAF50;"></i> {{ article.shares }} partages</div>
+                                </div>
+                            </div>
+
+                            {% if isExternalUrl %}
+                                <a href="{{ article.content }}"
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   class="read-more"
+                                   onclick="trackArticleClick({{ article.id }}, '{{ article.title|escape('js') }}')">
+                                    <i class="fas fa-external-link-alt external-link-icon"></i> Lire l'article complet
+                                </a>
+                            {% else %}
+                                <a href="{{ path('app_article_show', {'id': article.id}) }}" class="read-more">
+                                    <i class="fas fa-book-reader"></i> Lire l'article complet
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Message si aucun article -->
+            {% if articles|length == 0 %}
+                <div style="text-align: center; padding: 60px 20px;">
+                    <i class="fas fa-newspaper" style="font-size: 4rem; color: var(--gray); margin-bottom: 20px;"></i>
+                    <h3 style="color: var(--gray); margin-bottom: 15px;">Aucun article disponible</h3>
+                    <p style="color: var(--gray);">Créez votre premier article en cliquant sur "Nouvel Article"</p>
+                    <a href="{{ path('app_article_new') }}" class="btn-ajouter" style="position: relative; top: 0; right: 0; margin-top: 20px;">
+                        <i class="fas fa-plus"></i> Créer un article
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        // Gestion des filtres
+        function applyFilters() {
+            const category = document.getElementById('category').value;
+            const author = document.getElementById('author').value;
+
+            const cards = document.querySelectorAll('.article-card');
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const cardCategory = card.getAttribute('data-category');
+                const cardAuthor = card.getAttribute('data-author');
+
+                const categoryMatch = !category || cardCategory === category;
+                const authorMatch = !author || cardAuthor === author;
+
+                if (categoryMatch && authorMatch) {
+                    card.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // Afficher message si aucun résultat
+            const noResults = document.querySelector('.no-results-message');
+            if (visibleCount === 0) {
+                if (!noResults) {
+                    const grid = document.querySelector('.articles-grid');
+                    const message = document.createElement('div');
+                    message.className = 'no-results-message';
+                    message.style.textAlign = 'center';
+                    message.style.padding = '40px';
+                    message.style.color = 'var(--gray)';
+                    message.innerHTML = `
+                        <i class="fas fa-search" style="font-size: 3rem; margin-bottom: 20px;"></i>
+                        <h3>Aucun article ne correspond à vos critères</h3>
+                        <p>Essayez de modifier vos filtres</p>
+                    `;
+                    grid.appendChild(message);
+                }
+            } else if (noResults) {
+                noResults.remove();
+            }
+        }
+
+        function resetFilters() {
+            document.getElementById('category').value = '';
+            document.getElementById('author').value = '';
+            applyFilters();
+        }
+
+        // Fonction pour suivre les clics sur les articles externes
+        function trackArticleClick(articleId, articleTitle) {
+            // Vous pouvez implémenter un tracking ici si nécessaire
+            console.log('Article cliqué:', articleTitle, '(ID:', articleId, ')');
+
+            // Optionnel: Envoyer une requête au serveur pour le tracking
+            // fetch('/article/click/' + articleId, { method: 'POST' });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-hide flash messages after 5 seconds
+            setTimeout(() => {
+                document.querySelectorAll('.alert-message').forEach(msg => {
+                    msg.style.animation = 'slideIn 0.3s ease reverse';
+                    setTimeout(() => msg.remove(), 300);
+                });
+            }, 5000);
+        });
+    </script>
+{% endblock %}

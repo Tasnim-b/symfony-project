@@ -131,7 +131,8 @@
                 <div class="menu-section">
                     <h4>Expertise</h4>
 
-                    <a href="#" class="menu-item">
+
+                    <a href="{{ path('app_nutritionniste') }}" class="menu-item">
                         <i class="fas fa-user-md"></i>
                         <span>Nutritionniste expert</span>
                     </a>
@@ -171,12 +172,12 @@
                 <div class="menu-section">
                     <h4>Ressources</h4>
 
-                    <a href="#" class="menu-item">
+                    <a href="{{ path('app_guide_sante') }}" class="menu-item">
                         <i class="fas fa-book"></i>
                         <span>Guide santé</span>
                     </a>
 
-                    <a href="#" class="menu-item">
+                    <a href="{{ path('app_videos_exercices') }}" class="menu-item">
                         <i class="fas fa-video"></i>
                         <span>Vidéos d'exercices</span>
                     </a>
@@ -526,6 +527,6 @@
     </div>
 
     <!-- JavaScript -->
-    <script src="{{ asset('assets/js/dashboard.js') }}"></script>
+    <script src="{{ asset('js/dashboard.js') }}"></script>
 </body>
 </html>

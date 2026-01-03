@@ -1,0 +1,205 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ajouter un Nutritionniste{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .form-container {
+            max-width: 800px;
+            margin: 100px auto 40px;
+            padding: 0 20px;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .form-title {
+            color: #2e7d32;
+            font-size: 2rem;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #212121;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #2e7d32;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #212121;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-primary {
+            background: #2e7d32;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1b5e20;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(46, 125, 50, 0.3);
+        }
+
+        .form-error {
+            color: #f44336;
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+
+        textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .required:after {
+            content: " *";
+            color: #f44336;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="form-container">
+        <!-- Bouton retour -->
+        <a href="{{ path('app_nutritionniste') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i>
+            Retour à la liste
+        </a>
+
+        <!-- Messages flash -->
+        {% for message in app.flashes('success') %}
+            <div style="background: #4CAF50; color: white; padding: 15px; border-radius: 5px; margin: 20px 0; display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-check-circle"></i> {{ message }}
+            </div>
+        {% endfor %}
+
+        <div class="form-card">
+            <h1 class="form-title">
+                <i class="fas fa-user-plus"></i>
+                Ajouter un Nutritionniste
+            </h1>
+
+            {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+
+            <div class="form-group">
+                {{ form_label(form.nom, 'Nom complet *', {'label_attr': {'class': 'form-label required'}}) }}
+                {{ form_widget(form.nom, {'attr': {'class': 'form-control', 'placeholder': 'Dr. Nom Prénom'}}) }}
+                {{ form_errors(form.nom) }}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.specialite, 'Spécialité', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.specialite, {'attr': {'class': 'form-control', 'placeholder': 'Nutrition Sportive, Diététique Thérapeutique...'}}) }}
+                {{ form_errors(form.specialite) }}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.ville, 'Ville', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.ville, {'attr': {'class': 'form-control', 'placeholder': 'Tunis, Sfax, Sousse...'}}) }}
+                {{ form_errors(form.ville) }}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.adresse, 'Adresse *', {'label_attr': {'class': 'form-label required'}}) }}
+                {{ form_widget(form.adresse, {'attr': {'class': 'form-control', 'placeholder': 'Adresse complète du cabinet', 'rows': '3'}}) }}
+                {{ form_errors(form.adresse) }}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.telephone, 'Téléphone', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.telephone, {'attr': {'class': 'form-control', 'placeholder': 'XX XXX XXX'}}) }}
+                {{ form_errors(form.telephone) }}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.email, 'Email *', {'label_attr': {'class': 'form-label required'}}) }}
+                {{ form_widget(form.email, {'attr': {'class': 'form-control', 'placeholder': 'exemple@domaine.com'}}) }}
+                {{ form_errors(form.email) }}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.siteWeb, 'Site web *', {'label_attr': {'class': 'form-label required'}}) }}
+                {{ form_widget(form.siteWeb, {'attr': {'class': 'form-control', 'placeholder': 'https://www.votresite.com'}}) }}
+                {{ form_errors(form.siteWeb) }}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.description, 'Description *', {'label_attr': {'class': 'form-label required'}}) }}
+                {{ form_widget(form.description, {'attr': {'class': 'form-control', 'placeholder': 'Description des services, spécialités, approche...', 'rows': '5'}}) }}
+                {{ form_errors(form.description) }}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.tarifConsultation, 'Tarif consultation (TND)', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.tarifConsultation, {'attr': {'class': 'form-control', 'placeholder': 'Ex: 80.00'}}) }}
+                {{ form_errors(form.tarifConsultation) }}
+            </div>
+
+            <div class="form-actions">
+                <a href="{{ path('app_nutritionniste') }}" class="btn btn-secondary">
+                    Annuler
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Ajouter le nutritionniste
+                </button>
+            </div>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}

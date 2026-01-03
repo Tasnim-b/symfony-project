@@ -1,0 +1,1058 @@
+{# templates/health_guide/new.html.twig #}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nouvel Article - HEALFIT</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2e7d32;
+            --primary-light: #4caf50;
+            --primary-dark: #1b5e20;
+            --secondary: #ff9800;
+            --accent: #2196f3;
+            --light: #f8f9fa;
+            --dark: #212121;
+            --gray: #757575;
+            --light-gray: #f5f5f5;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+            --transition: all 0.3s ease;
+            --radius: 12px;
+            --radius-sm: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            color: var(--dark);
+            overflow-x: hidden;
+        }
+
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            grid-template-rows: 70px 1fr;
+            min-height: 100vh;
+        }
+
+        /* Navbar */
+        .dashboard-navbar {
+            grid-column: 1 / -1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: white;
+            padding: 0 30px;
+            box-shadow: var(--shadow);
+            z-index: 100;
+            position: sticky;
+            top: 0;
+        }
+
+        .navbar-left, .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .dashboard-logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            gap: 12px;
+        }
+
+        .logo-text {
+            font-weight: 700;
+            font-size: 1.5rem;
+            display: flex;
+        }
+
+        .logo-part1 {
+            color: var(--primary-dark);
+        }
+
+        .logo-part2 {
+            color: var(--secondary);
+        }
+
+        .dashboard-title {
+            font-size: 1.5rem;
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+
+        .notification-icon, .messaging-icon {
+            position: relative;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: var(--light-gray);
+            transition: var(--transition);
+        }
+
+        .notification-icon:hover, .messaging-icon:hover {
+            background-color: var(--primary-light);
+            color: white;
+        }
+
+        .notification-badge, .message-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background-color: var(--secondary);
+            color: white;
+            font-size: 0.7rem;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .user-profile-dropdown {
+            position: relative;
+        }
+
+        .user-avatar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 25px;
+            background-color: var(--light-gray);
+            transition: var(--transition);
+        }
+
+        .user-avatar:hover {
+            background-color: var(--primary-light);
+            color: white;
+        }
+
+        .profile-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary);
+        }
+
+        .user-avatar i {
+            font-size: 0.8rem;
+            transition: var(--transition);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 280px;
+            background-color: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            padding: 15px 0;
+            margin-top: 10px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: var(--transition);
+            z-index: 1000;
+        }
+
+        .user-profile-dropdown:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 0 20px 15px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .menu-profile-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary);
+        }
+
+        .user-details h4 {
+            color: var(--dark);
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
+
+        .user-details p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background-color: var(--light-gray);
+            margin: 10px 0;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            text-decoration: none;
+            color: var(--dark);
+            transition: var(--transition);
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--light-gray);
+            color: var(--primary);
+        }
+
+        .dropdown-item i {
+            width: 20px;
+            text-align: center;
+            color: var(--primary);
+        }
+
+        .dropdown-item.logout {
+            color: #f44336;
+        }
+
+        .dropdown-item.logout i {
+            color: #f44336;
+        }
+
+        /* Sidebar */
+        .dashboard-sidebar {
+            background-color: white;
+            padding: 20px 0;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            position: sticky;
+            top: 70px;
+            height: calc(100vh - 70px);
+            overflow-y: auto;
+            transition: var(--transition);
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px 20px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .sidebar-header h3 {
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-toggle {
+            background: none;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--gray);
+            transition: var(--transition);
+        }
+
+        .sidebar-toggle:hover {
+            background-color: var(--light-gray);
+            color: var(--primary);
+        }
+
+        .sidebar-menu {
+            flex: 1;
+            padding: 20px 0;
+            overflow-y: auto;
+        }
+
+        .menu-section {
+            margin-bottom: 25px;
+            padding: 0 20px;
+        }
+
+        .menu-section h4 {
+            color: var(--gray);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 15px;
+            text-decoration: none;
+            color: var(--dark);
+            border-radius: var(--radius-sm);
+            margin-bottom: 5px;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .menu-item:hover {
+            background-color: var(--light-gray);
+            color: var(--primary);
+        }
+
+        .menu-item.active {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .badge {
+            background-color: var(--secondary);
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: auto;
+        }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--light-gray);
+        }
+
+        .user-progress {
+            margin-bottom: 20px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background-color: var(--light-gray);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-light), var(--primary));
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .premium-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--secondary), #ff8a00);
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .premium-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 152, 0, 0.3);
+        }
+
+        /* Contenu principal */
+        .dashboard-content {
+            padding: 25px;
+            overflow-y: auto;
+            max-height: calc(100vh - 70px);
+        }
+
+        .welcome-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        @media (max-width: 1200px) {
+            .welcome-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .welcome-card {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 30px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .welcome-card h2 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .user-name {
+            color: var(--secondary);
+        }
+
+        .welcome-stats {
+            display: flex;
+            gap: 30px;
+            margin-top: 25px;
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .stat i {
+            font-size: 2rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .stat h4 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .stat span {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .date-card {
+            background-color: white;
+            padding: 25px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .date-card h3 {
+            color: var(--primary-dark);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .current-date {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .date-day {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            line-height: 1;
+        }
+
+        .date-month {
+            color: var(--gray);
+            font-size: 1.1rem;
+        }
+
+        .next-workout {
+            background-color: var(--light-gray);
+            padding: 15px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-start {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-start:hover {
+            background-color: #e68900;
+            transform: translateY(-2px);
+        }
+
+        /* Formulaire */
+        .form-card {
+            background-color: white;
+            padding: 30px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 25px;
+        }
+
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .form-header h3 {
+            color: var(--primary-dark);
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .article-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            color: var(--dark);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .form-label i {
+            color: var(--primary);
+            width: 16px;
+            text-align: center;
+        }
+
+        .form-input, .form-textarea, .form-select {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: var(--radius-sm);
+            font-size: 1rem;
+            background-color: white;
+            transition: var(--transition);
+            width: 100%;
+            font-family: inherit;
+        }
+
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-help {
+            margin-top: 5px;
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 16px;
+            padding-right: 40px;
+        }
+
+        /* Boutons d'action */
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--light-gray);
+        }
+
+        .btn-publish {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1rem;
+        }
+
+        .btn-publish:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(46, 125, 50, 0.3);
+        }
+
+        .btn-cancel {
+            background-color: var(--light-gray);
+            color: var(--dark);
+            border: none;
+            padding: 12px 30px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            font-size: 1rem;
+        }
+
+        .btn-cancel:hover {
+            background-color: #e0e0e0;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: 70px auto 1fr;
+            }
+
+            .dashboard-sidebar {
+                position: fixed;
+                left: -280px;
+                top: 70px;
+                height: calc(100vh - 70px);
+                z-index: 999;
+                transition: left 0.3s ease;
+            }
+
+            .dashboard-sidebar.active {
+                left: 0;
+            }
+
+            .dashboard-content {
+                grid-column: 1;
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-navbar {
+                padding: 0 15px;
+            }
+
+            .dashboard-title {
+                display: none;
+            }
+
+            .form-card {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .welcome-card, .date-card {
+                padding: 20px;
+            }
+
+            .welcome-card h2 {
+                font-size: 1.5rem;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn-publish, .btn-cancel {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="dashboard-container">
+    <!-- NAVBAR -->
+    <nav class="dashboard-navbar">
+        <div class="navbar-left">
+            <a href="{{ path('app_dashboard') }}" class="dashboard-logo">
+                <div class="logo-text">
+                    <span class="logo-part1">HEAL</span><span class="logo-part2">FIT</span>
+                </div>
+            </a>
+            <h2 class="dashboard-title">Nouvel Article</h2>
+        </div>
+
+        <div class="navbar-right">
+            <div class="notification-icon">
+                <i class="fas fa-bell"></i>
+                <span class="notification-badge">3</span>
+            </div>
+            <div class="messaging-icon">
+                <i class="fas fa-comment"></i>
+                <span class="message-badge">5</span>
+            </div>
+            <div class="user-profile-dropdown">
+                <div class="user-avatar">
+                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Utilisateur" class="profile-img">
+                    <span>John Doe</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="dropdown-menu">
+                    <div class="user-info">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Utilisateur" class="menu-profile-img">
+                        <div class="user-details">
+                            <h4>John Doe</h4>
+                            <p>john.doe@example.com</p>
+                        </div>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="dropdown-item">
+                        <i class="fas fa-user"></i>
+                        <span>Mon Profil</span>
+                    </a>
+                    <a href="#" class="dropdown-item">
+                        <i class="fas fa-cog"></i>
+                        <span>Paramètres</span>
+                    </a>
+                    <a href="#" class="dropdown-item">
+                        <i class="fas fa-question-circle"></i>
+                        <span>Aide & Support</span>
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="dropdown-item logout">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Déconnexion</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- SIDEBAR -->
+    <aside class="dashboard-sidebar">
+        <div class="sidebar-header">
+            <h3><i class="fas fa-user-circle"></i> John Doe</h3>
+            <button class="sidebar-toggle">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+        </div>
+
+        <nav class="sidebar-menu">
+            <div class="menu-section">
+                <h4>MES PROGRÈS</h4>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Mes statistiques</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-bullseye"></i>
+                    <span>Mes objectifs</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-award"></i>
+                    <span>Mes badges</span>
+                </a>
+            </div>
+
+            <div class="menu-section">
+                <h4>RESSOURCES</h4>
+                <a href="{{ path('app_guide_sante') }}" class="menu-item active">
+                    <i class="fas fa-book-medical"></i>
+                    <span>Guide santé</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-video"></i>
+                    <span>Vidéos d'exercices</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Rapports mensuels</span>
+                </a>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-progress">
+                <div class="progress-info">
+                    <span>Progression mensuelle</span>
+                    <span>65%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 65%"></div>
+                </div>
+            </div>
+            <button class="premium-btn">
+                <i class="fas fa-crown"></i>
+                Passer à Premium
+            </button>
+        </div>
+    </aside>
+
+    <!-- CONTENU PRINCIPAL -->
+    <main class="dashboard-content">
+        <!-- Section de bienvenue -->
+        <div class="welcome-section">
+            <div class="welcome-card">
+                <h2>Publier un nouvel article</h2>
+                <p>Partagez vos connaissances en santé et bien-être avec la communauté HEALFIT</p>
+            </div>
+
+            <div class="date-card">
+                <h3><i class="fas fa-calendar-alt"></i> Aujourd'hui</h3>
+                <div class="current-date">
+                    <div class="date-day">{{ "now"|date('d') }}</div>
+                    <div class="date-month">{{ "now"|date('F Y') }}</div>
+                </div>
+                <div class="next-workout">
+                    <div>
+                        <h4>Retour aux articles</h4>
+                        <p>Voir toutes les publications</p>
+                    </div>
+                    <a href="{{ path('app_guide_sante') }}" class="btn-start">
+                        <i class="fas fa-arrow-left"></i> Retour
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulaire de publication -->
+        <div class="form-card">
+            <div class="form-header">
+                <h3><i class="fas fa-edit"></i> Rédiger votre article</h3>
+            </div>
+
+            <form method="post" action="{{ path('app_article_new') }}" class="article-form">
+                <!-- CSRF Token -->
+                <input type="hidden" name="_token" value="{{ csrf_token('article_new') }}">
+
+                <!-- Première ligne : Titre et Catégorie -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="title" class="form-label">
+                            <i class="fas fa-heading"></i> Titre de l'article
+                        </label>
+                        <input type="text" id="title" name="title" required
+                               placeholder="Ex: Les bienfaits de la méditation quotidienne"
+                               class="form-input">
+                        <div class="form-help">Titre accrocheur qui résume votre article</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category" class="form-label">
+                            <i class="fas fa-tag"></i> Catégorie
+                        </label>
+                        <select id="category" name="category" required class="form-select">
+                            <option value="">Sélectionnez une catégorie</option>
+                            <option value="Nutrition">🍎 Nutrition</option>
+                            <option value="Exercice">🏃‍♂️ Exercice</option>
+                            <option value="Sommeil">😴 Sommeil</option>
+                            <option value="Mental">🧠 Santé Mentale</option>
+                            <option value="Hydratation">💧 Hydratation</option>
+                            <option value="Prévention">🩺 Prévention</option>
+                            <option value="Conseils">💡 Conseils Pratiques</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Auteur -->
+                <div class="form-group">
+                    <label for="author" class="form-label">
+                        <i class="fas fa-user"></i> Auteur
+                    </label>
+                    <input type="text" id="author" name="author" required
+                           placeholder="Votre nom ou pseudo"
+                           class="form-input">
+                </div>
+
+                <!-- Résumé -->
+                <div class="form-group">
+                    <label for="excerpt" class="form-label">
+                        <i class="fas fa-align-left"></i> Résumé
+                    </label>
+                    <textarea id="excerpt" name="excerpt" required
+                              placeholder="Un court résumé qui apparaîtra dans la liste des articles (maximum 200 caractères)..."
+                              class="form-textarea" rows="3" maxlength="200"></textarea>
+                    <div class="form-help">Court et accrocheur. Restez sous 200 caractères.</div>
+                </div>
+
+                <!-- Contenu ou URL -->
+                <div class="form-group">
+                    <label for="content" class="form-label">
+                        <i class="fas fa-link"></i> URL de l'article complet OU Contenu
+                    </label>
+                    <textarea id="content" name="content" required
+                              placeholder="https://www.exemple.com/article-complet
+
+OU écrivez directement votre contenu ici..."
+                              class="form-textarea" rows="10"></textarea>
+                    <div class="form-help">
+                        <strong>Option 1 :</strong> Entrez une URL (commençant par http:// ou https://) pour rediriger vers un article externe<br>
+                        <strong>Option 2 :</strong> Écrivez directement votre contenu si vous créez un article interne
+                    </div>
+                </div>
+
+                <!-- Deuxième ligne : Temps de lecture et Image -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="read_time" class="form-label">
+                            <i class="fas fa-clock"></i> Temps de lecture estimé
+                        </label>
+                        <input type="text" id="read_time" name="read_time" required
+                               placeholder="Ex: 5 min"
+                               class="form-input">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="image" class="form-label">
+                            <i class="fas fa-image"></i> URL de l'image
+                        </label>
+                        <input type="url" id="image" name="image"
+                               placeholder="https://images.unsplash.com/photo-..."
+                               class="form-input">
+                        <div class="form-help">Laissez vide pour utiliser une image par défaut selon la catégorie</div>
+                    </div>
+                </div>
+
+                <!-- Boutons d'action -->
+                <div class="form-actions">
+                    <button type="submit" class="btn-publish">
+                        <i class="fas fa-paper-plane"></i> Publier l'article
+                    </button>
+                    <a href="{{ path('app_guide_sante') }}" class="btn-cancel">
+                        <i class="fas fa-times"></i> Annuler
+                    </a>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+
+<script>
+    // Compteur de caractères pour le résumé
+    const excerptTextarea = document.getElementById('excerpt');
+    const excerptHelp = excerptTextarea.nextElementSibling;
+
+    excerptTextarea.addEventListener('input', function() {
+        const charCount = this.value.length;
+        const maxChars = 200;
+
+        if (charCount > maxChars) {
+            this.value = this.value.substring(0, maxChars);
+            excerptHelp.textContent = `Maximum ${maxChars} caractères atteint!`;
+            excerptHelp.style.color = '#f44336';
+        } else {
+            excerptHelp.textContent = `${charCount}/${maxChars} caractères. Court et accrocheur.`;
+            excerptHelp.style.color = 'var(--gray)';
+        }
+    });
+
+    // Validation du formulaire
+    const form = document.querySelector('.article-form');
+    form.addEventListener('submit', function(e) {
+        const title = document.getElementById('title').value.trim();
+        const excerpt = document.getElementById('excerpt').value.trim();
+        const content = document.getElementById('content').value.trim();
+        const category = document.getElementById('category').value;
+        const author = document.getElementById('author').value.trim();
+        const readTime = document.getElementById('read_time').value.trim();
+
+        if (!title || !excerpt || !content || !category || !author || !readTime) {
+            e.preventDefault();
+            alert('Veuillez remplir tous les champs obligatoires (*)');
+            return false;
+        }
+
+        if (excerpt.length > 200) {
+            e.preventDefault();
+            alert('Le résumé ne doit pas dépasser 200 caractères');
+            return false;
+        }
+
+        return true;
+    });
+
+    // Gestion du menu utilisateur
+    const userDropdown = document.querySelector('.user-profile-dropdown');
+    const dropdownMenu = userDropdown.querySelector('.dropdown-menu');
+
+    userDropdown.addEventListener('mouseenter', function() {
+        dropdownMenu.style.opacity = '1';
+        dropdownMenu.style.visibility = 'visible';
+        dropdownMenu.style.transform = 'translateY(0)';
+    });
+
+    userDropdown.addEventListener('mouseleave', function() {
+        dropdownMenu.style.opacity = '0';
+        dropdownMenu.style.visibility = 'hidden';
+        dropdownMenu.style.transform = 'translateY(-10px)';
+    });
+</script>
+</body>
+</html>
