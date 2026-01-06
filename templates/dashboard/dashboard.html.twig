@@ -106,13 +106,13 @@
                 <div class="menu-section">
                     <h4>Santé & Fitness</h4>
 
-                    <a href="#" class="menu-item">
+                    <a href="{{ path('diet_plan') }}" class="menu-item">
                         <i class="fas fa-utensils"></i>
                         <span>Régime alimentaire</span>
                         <span class="badge">Nouveau</span>
                     </a>
 
-                    <a href="#" class="menu-item">
+                    <a href="{{ path('app_workout_personalized') }}" class="menu-item">
                         <i class="fas fa-dumbbell"></i>
                         <span>Workout personnalisé</span>
                     </a>
@@ -526,6 +526,6 @@
     </div>
 
     <!-- JavaScript -->
-    <script src="{{ asset('assets/js/dashboard.js') }}"></script>
+    <script src="{{ asset('js/dashboard.js') }}"></script>
 </body>
 </html>
