@@ -1,531 +1,256 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HealFit Dashboard</title>
+{% extends 'dashboard/base_dashboard.html.twig' %}
 
-    <!-- CSS -->
-    <link rel="stylesheet" href="{{ asset('assets/styles/dashboard.css') }}">
+{% block title %}HealFit Dashboard{% endblock %}
 
-    <!-- Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js pour les graphiques -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-    <div class="dashboard-container">
-        <!-- Navbar -->
-        <nav class="dashboard-navbar">
-            <div class="navbar-left">
-                <a href="{{ path('app_home') }}" class="dashboard-logo">
-                    <img src="{{ asset('assets/images/healFit-logo.png') }}" alt="HealFit Logo" class="logo-img">
-                    <span class="logo-text">
-                        <span class="logo-part1">HEAL</span>
-                        <span class="logo-part2">FIT</span>
-                    </span>
-                </a>
-            </div>
-
-            <div class="navbar-center">
-                <h1 class="dashboard-title">Tableau de Bord</h1>
-            </div>
-
-            <div class="navbar-right">
-                <!-- Notification -->
-                {% set notifCount = getAllNotificationsCount(app.user) %}
-                <div class="notification-icon">
-                    <a href="{{ path('app_notifications') }}">
-                    <i class="fas fa-bell"></i>
-                    <span class="notification-badge" id="notificationBadge" style="{{ notifCount > 0 ? '' : 'display: none;' }}">{{ notifCount > 0 ? notifCount : 0 }}</span>
-                    </a>
-                </div>
-
-                <!-- Messagerie -->
-                {% set unreadMessages = getUnreadMessagesCount(app.user) %}
-                <div class="messaging-icon">
-                    <a href="{{ path('app_messagerie') }}">
-                        <i class="fas fa-envelope"></i>
-
-                            <span class="message-badge" id="globalUnreadCount" style="{{ unreadMessages > 0 ? '' : 'display: none;' }}">{{ unreadMessages > 0 ? unreadMessages : 0 }}</span>
-
-                    </a>
-                </div>
-
-                <!-- Profil Utilisateur -->
-                <div class="user-profile-dropdown">
-                    <div class="user-avatar" id="userMenuTrigger">
-                        {% if user.profileImage %}
-                            <img src="{{ asset('uploads/profile_images/' ~ user.profileImage) }}"
-                                alt="Photo de profil"
-                                class="profile-img"
-                                onerror="this.src='{{ asset('assets/images/default-avatar.jpg') }}'">
-                        {% else %}
-                            <img src="{{ asset('assets/images/default-avatar.jpg') }}"
-                                alt="Photo de profil"
-                                class="profile-img">
-                        {% endif %}
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-
-                    <div class="dropdown-menu" id="userMenu">
-                        <div class="user-info">
-                            {% if user.profileImage %}
-                                <img src="{{ asset('uploads/profile_images/' ~ user.profileImage) }}"
-                                    alt="Photo de profil"
-                                    class="menu-profile-img"
-                                    onerror="this.src='{{ asset('assets/images/default-avatar.jpg') }}'">
-                            {% else %}
-                                <img src="{{ asset('assets/images/default-avatar.jpg') }}"
-                                    alt="Photo de profil"
-                                    class="menu-profile-img">
-                            {% endif %}
-                            <div class="user-details">
-                                <h4>{{ user.fullName }}</h4>
-                                <p>Membre {% if 'ROLE_PREMIUM' in user.roles %}Premium{% else %}Standard{% endif %}</p>
-                            </div>
-                        </div>
-
-                        <div class="dropdown-divider"></div>
-
-                        <a href="{{ path('app_profil') }}" class="dropdown-item">
-                            <i class="fas fa-user-circle"></i>
-                            <span>Mon Profil</span>
-                        </a>
-
-                        <a href="{{ path('app_dashboard') }}" class="dropdown-item active">
-                            <i class="fas fa-tachometer-alt"></i>
-                            <span>Tableau de bord</span>
-                        </a>
-
-                        <a href="#" class="dropdown-item">
-                            <i class="fas fa-chart-line"></i>
-                            <span>Mes Statistiques</span>
-                        </a>
-
-                        <div class="dropdown-divider"></div>
-
-                        <!-- FORMULAIRE DE DÉCONNEXION (POST avec CSRF) -->
-                        <form action="{{ path('app_logout') }}" method="POST" class="logout-form">
-                            <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
-                            <button type="submit" class="dropdown-item logout">
-                                <i class="fas fa-sign-out-alt"></i>
-                                <span>Déconnexion</span>
-                            </button>
-                        </form>
+{% block content %}
+    <!-- Cartes de bienvenue et stats rapides -->
+    <div class="welcome-section">
+        <div class="welcome-card">
+            <h2>Bonjour, <span class="user-name">{{ user.fullName }}</span> 👋</h2>
+            <p>Vous avez complété {{ dashboard.quick_stats.workouts_this_week }} entraînements cette semaine. Continuez comme ça !</p>
+            <div class="welcome-stats">
+                <div class="stat">
+                    <i class="fas fa-fire"></i>
+                    <div>
+                        <h4>{{ dashboard.quick_stats.calories_burned|number_format(0, ',', ' ') }}</h4>
+                        <span>Calories brûlées</span>
                     </div>
                 </div>
-            </div>
-        </nav>
-
-        <!-- Sidebar -->
-        <aside class="dashboard-sidebar">
-            <div class="sidebar-header">
-                <h3><i class="fas fa-bars"></i> Menu</h3>
-                <button class="sidebar-toggle" id="sidebarToggle">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-            </div>
-
-            <nav class="sidebar-menu">
-                <a href="#" class="menu-item active">
-                    <i class="fas fa-tachometer-alt"></i>
-                    <span>Tableau de bord</span>
-                </a>
-
-                <div class="menu-section">
-                    <h4>Santé & Fitness</h4>
-
-                    <a href="#" class="menu-item">
-                        <i class="fas fa-utensils"></i>
-                        <span>Régime alimentaire</span>
-                        <span class="badge">Nouveau</span>
-                    </a>
-
-                    <a href="#" class="menu-item">
-                        <i class="fas fa-dumbbell"></i>
-                        <span>Workout personnalisé</span>
-                    </a>
-
-                    <a href="#" class="menu-item">
-                        <i class="fas fa-calendar-alt"></i>
-                        <span>Planning d'entraînement</span>
-                    </a>
-
-                    <a href="#" class="menu-item">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <span>Salle de sport proche</span>
-                    </a>
-                </div>
-
-                <div class="menu-section">
-                    <h4>Expertise</h4>
-
-                    <a href="#" class="menu-item">
-                        <i class="fas fa-user-md"></i>
-                        <span>Nutritionniste expert</span>
-                    </a>
-
-                    <a href="{{ path('app_communaute') }}" class="menu-item">
-                        <i class="fas fa-users"></i>
-                        <span>Communauté</span>
-                        <span class="badge">{{ getTotalUsers() }}</span>
-                    </a>
-
-                    <a href="#" class="menu-item">
-                        <i class="fas fa-building"></i>
-                        <span>Partenaires fitness</span>
-                    </a>
-                </div>
-
-                <div class="menu-section">
-                    <h4>Progression</h4>
-
-                    <a href="#" class="menu-item">
-                        <i class="fas fa-chart-line"></i>
-                        <span>Mes progrès</span>
-                    </a>
-
-                    <a href="#" class="menu-item">
-                        <i class="fas fa-trophy"></i>
-                        <span>Mes objectifs</span>
-                    </a>
-
-                    <a href="#" class="menu-item">
-                        <i class="fas fa-award"></i>
-                        <span>Mes badges</span>
-                        <span class="badge">8</span>
-                    </a>
-                </div>
-
-                <div class="menu-section">
-                    <h4>Ressources</h4>
-
-                    <a href="#" class="menu-item">
-                        <i class="fas fa-book"></i>
-                        <span>Guide santé</span>
-                    </a>
-
-                    <a href="#" class="menu-item">
-                        <i class="fas fa-video"></i>
-                        <span>Vidéos d'exercices</span>
-                    </a>
-
-                    <a href="#" class="menu-item">
-                        <i class="fas fa-file-alt"></i>
-                        <span>Rapports mensuels</span>
-                    </a>
-                </div>
-            </nav>
-
-            <div class="sidebar-footer">
-                <div class="user-progress">
-                    <div class="progress-info">
-                        <span>Progression mensuelle</span>
-                        <span>65%</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 65%"></div>
+                <div class="stat">
+                    <i class="fas fa-running"></i>
+                    <div>
+                        <h4>{{ dashboard.quick_stats.distance }}km</h4>
+                        <span>Distance parcourue</span>
                     </div>
                 </div>
-
-                <button class="premium-btn">
-                    <i class="fas fa-crown"></i>
-                    Passer à Premium
-                </button>
-            </div>
-        </aside>
-
-        <!-- Contenu principal -->
-        <main class="dashboard-content">
-            <!-- Cartes de bienvenue et stats rapides -->
-            <div class="welcome-section">
-                <div class="welcome-card">
-                    <h2>Bonjour, <span class="user-name">{{ user.fullName }}</span> 👋</h2>
-                    <p>Vous avez complété {{ dashboard.quick_stats.workouts_this_week }} entraînements cette semaine. Continuez comme ça !</p>
-                    <div class="welcome-stats">
-                        <div class="stat">
-                            <i class="fas fa-fire"></i>
-                            <div>
-                                <h4>{{ dashboard.quick_stats.calories_burned|number_format(0, ',', ' ') }}</h4>
-                                <span>Calories brûlées</span>
-                            </div>
-                        </div>
-                        <div class="stat">
-                            <i class="fas fa-running"></i>
-                            <div>
-                                <h4>{{ dashboard.quick_stats.distance }}km</h4>
-                                <span>Distance parcourue</span>
-                            </div>
-                        </div>
-                        <div class="stat">
-                            <i class="fas fa-heartbeat"></i>
-                            <div>
-                                <h4>{{ dashboard.quick_stats.avg_bpm }}</h4>
-                                <span>BPM moyenne</span>
-                            </div>
-                        </div>
+                <div class="stat">
+                    <i class="fas fa-heartbeat"></i>
+                    <div>
+                        <h4>{{ dashboard.quick_stats.avg_bpm }}</h4>
+                        <span>BPM moyenne</span>
                     </div>
                 </div>
-
-                <div class="date-card">
-                    <h3><i class="fas fa-calendar-day"></i> Aujourd'hui</h3>
-                    <div class="current-date">
-                        <div class="date-day">{{ "now"|date("d") }}</div>
-                        <div class="date-month">{{ "now"|date("F Y") }}</div>
-                    </div>
-                    <div class="next-workout">
-                        {% set nextWorkout = dashboard.workouts|filter(w => w.status == 'pending')|first %}
-                        {% if nextWorkout %}
-                            <p>Prochain entraînement: <strong>{{ nextWorkout.name }} ({{ nextWorkout.time }})</strong></p>
-                            <button class="btn-start">Commencer</button>
-                        {% else %}
-                            <p>Aucun entraînement prévu aujourd'hui</p>
-                            <button class="btn-start">Planifier</button>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-
-            <!-- Graphiques et statistiques -->
-            <div class="charts-section">
-                <div class="chart-card">
-                    <div class="chart-header">
-                        <h3>Progression hebdomadaire</h3>
-                        <select class="chart-select">
-                            <option>Cette semaine</option>
-                            <option>Ce mois</option>
-                            <option>Cette année</option>
-                        </select>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="progressChart"
-                                data-labels="{{ dashboard.weekly_progress.labels|json_encode }}"
-                                data-calories="{{ dashboard.weekly_progress.calories|json_encode }}"
-                                data-distance="{{ dashboard.weekly_progress.distance|json_encode }}">
-                        </canvas>
-                    </div>
-                </div>
-
-                <div class="chart-card">
-                    <div class="chart-header">
-                        <h3>Répartition des calories</h3>
-                        <div class="chart-legend">
-                            <span class="legend-item"><i class="fas fa-circle" style="color: #4CAF50;"></i> Protéines ({{ dashboard.nutrition.proteins }}%)</span>
-                            <span class="legend-item"><i class="fas fa-circle" style="color: #2196F3;"></i> Glucides ({{ dashboard.nutrition.carbs }}%)</span>
-                            <span class="legend-item"><i class="fas fa-circle" style="color: #FF9800;"></i> Lipides ({{ dashboard.nutrition.fats }}%)</span>
-                        </div>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="caloriesChart"
-                                data-proteins="{{ dashboard.nutrition.proteins }}"
-                                data-carbs="{{ dashboard.nutrition.carbs }}"
-                                data-fats="{{ dashboard.nutrition.fats }}">
-                        </canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Entraînements et régime -->
-            <div class="workout-diet-section">
-                <div class="workout-plan">
-                    <div class="section-header">
-                        <h3><i class="fas fa-dumbbell"></i> Entraînement du jour</h3>
-                        <a href="#" class="view-all">Voir le planning complet <i class="fas fa-arrow-right"></i></a>
-                    </div>
-
-                    <div class="workout-list">
-                        {% for workout in dashboard.workouts %}
-                            <div class="workout-item">
-                                <div class="workout-icon">
-                                    {% if workout.name == 'Cardio Training' %}
-                                        <i class="fas fa-running"></i>
-                                    {% elseif workout.name == 'Musculation' %}
-                                        <i class="fas fa-dumbbell"></i>
-                                    {% elseif workout.name == 'Natation' %}
-                                        <i class="fas fa-water"></i>
-                                    {% else %}
-                                        <i class="fas fa-dumbbell"></i>
-                                    {% endif %}
-                                </div>
-                                <div class="workout-details">
-                                    <h4>{{ workout.name }}</h4>
-                                    <p>{{ workout.duration }} min •
-                                    {% if workout.calories is defined %}
-                                        Brûle {{ workout.calories }} calories
-                                    {% elseif workout.type is defined %}
-                                        {{ workout.type }}
-                                    {% endif %}
-                                    </p>
-                                </div>
-                                <div class="workout-status {{ workout.status }}">
-                                    {% if workout.status == 'completed' %}
-                                        <i class="fas fa-check"></i>
-                                        Terminé
-                                    {% elseif workout.status == 'pending' %}
-                                        <i class="fas fa-clock"></i>
-                                        {{ workout.time }}
-                                    {% elseif workout.status == 'upcoming' %}
-                                        <i class="fas fa-calendar"></i>
-                                        {{ workout.time }}
-                                    {% endif %}
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </div>
-                </div>
-
-                <div class="diet-plan">
-                    <div class="section-header">
-                        <h3><i class="fas fa-utensils"></i> Repas recommandés</h3>
-                        <a href="#" class="view-all">Voir le menu complet <i class="fas fa-arrow-right"></i></a>
-                    </div>
-
-                    <div class="meal-list">
-                        {% for meal in dashboard.meals %}
-                            <div class="meal-item">
-                                <div class="meal-time">{{ meal.time }}</div>
-                                <div class="meal-details">
-                                    <h4>{{ meal.name }}</h4>
-                                    <p>{{ meal.calories }} kcal • {{ meal.proteins }}g protéines</p>
-                                </div>
-                                <div class="meal-check">
-                                    {% if meal.completed %}
-                                        <i class="fas fa-check-circle" style="color: #2e7d32;"></i>
-                                    {% else %}
-                                        <i class="far fa-circle"></i>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-
-            <!-- Salle de sport et communauté -->
-            <div class="gym-community-section">
-                <div class="gym-card">
-                    <div class="section-header">
-                        <h3><i class="fas fa-map-marker-alt"></i> Salles de sport proches</h3>
-                        <button class="btn-refresh"><i class="fas fa-sync-alt"></i></button>
-                    </div>
-
-                    <div class="gym-list">
-                        <div class="gym-item">
-                            <div class="gym-info">
-                                <h4>Fitness First</h4>
-                                <p><i class="fas fa-map-marker"></i> 1.2 km • Ouvert 24h/24</p>
-                                <div class="gym-rating">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star-half-alt"></i>
-                                    <span>4.5 (128 avis)</span>
-                                </div>
-                            </div>
-                            <button class="btn-direction">
-                                <i class="fas fa-directions"></i> Itinéraire
-                            </button>
-                        </div>
-
-                        <div class="gym-item">
-                            <div class="gym-info">
-                                <h4>Urban Fit Club</h4>
-                                <p><i class="fas fa-map-marker"></i> 2.5 km • Piscine incluse</p>
-                                <div class="gym-rating">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="far fa-star"></i>
-                                    <span>4.0 (89 avis)</span>
-                                </div>
-                            </div>
-                            <button class="btn-direction">
-                                <i class="fas fa-directions"></i> Itinéraire
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="community-card">
-                    <div class="section-header">
-                        <h3><i class="fas fa-users"></i> Communauté active</h3>
-                        <a href="{{path('app_communaute')}}" class="view-all">Voir tous <i class="fas fa-arrow-right"></i></a>
-                    </div>
-
-                    <div class="community-members">
-                        {% set activeUsers = getActiveCommunityUsers(app.user, 5) %}
-                        {% if activeUsers is empty %}
-                            <div class="no-active-members">Aucun membre actif pour le moment.</div>
-                        {% else %}
-                            {% for member in activeUsers %}
-                                <div class="member">
-                                    <img src="{{ member.profileImage ? asset('uploads/profile_images/' ~ member.profileImage) : 'https://randomuser.me/api/portraits/lego/1.jpg' }}" alt="Membre">
-                                    <div class="member-info">
-                                        <h5>{{ member.fullName }}</h5>
-                                        <p>Dernière activité : {{ member.lastActivity ? member.lastActivity|date('H:i') : '' }}</p>
-                                    </div>
-                                    <button class="btn-follow">Suivre</button>
-                                </div>
-                            {% endfor %}
-                        {% endif %}
-                    </div>
-
-                    <div class="community-challenge">
-                        <h4>Défi du mois: 100km en course</h4>
-                        <div class="challenge-progress">
-                            <div class="progress-info">
-                                <span>Votre progression: 42km</span>
-                                <span>42%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 42%"></div>
-                            </div>
-                        </div>
-                        <button class="btn-challenge">Participer</button>
-                    </div>
-                </div>
-            </div>
-        </main>
-
-        <!-- Chatbot -->
-        <div class="chatbot-widget" id="chatbotWidget">
-            <div class="chatbot-header">
-                <div class="chatbot-title">
-                    <i class="fas fa-robot"></i>
-                    <span>Assistant HealFit</span>
-                </div>
-                <button class="chatbot-close" id="closeChatbot">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-
-            <div class="chatbot-messages" id="chatbotMessages">
-                <div class="message bot">
-                    <div class="message-content">
-                        Bonjour ! Je suis votre assistant HealFit. Comment puis-je vous aider aujourd'hui ?
-                    </div>
-                    <div class="message-time">Maintenant</div>
-                </div>
-            </div>
-
-            <div class="chatbot-input">
-                <input type="text" id="chatbotInput" placeholder="Posez-moi une question...">
-                <button id="sendMessage">
-                    <i class="fas fa-paper-plane"></i>
-                </button>
             </div>
         </div>
 
-        <!-- Bouton d'ouverture du chatbot -->
-        <button class="chatbot-toggle" id="openChatbot">
-            <i class="fas fa-robot"></i>
-        </button>
+        <div class="date-card">
+            <h3><i class="fas fa-calendar-day"></i> Aujourd'hui</h3>
+            <div class="current-date">
+                <div class="date-day">{{ "now"|date("d") }}</div>
+                <div class="date-month">{{ "now"|date("F Y") }}</div>
+            </div>
+            <div class="next-workout">
+                {% set nextWorkout = dashboard.workouts|filter(w => w.status == 'pending')|first %}
+                {% if nextWorkout %}
+                    <p>Prochain entraînement: <strong>{{ nextWorkout.name }} ({{ nextWorkout.time }})</strong></p>
+                    <button class="btn-start">Commencer</button>
+                {% else %}
+                    <p>Aucun entraînement prévu aujourd'hui</p>
+                    <button class="btn-start">Planifier</button>
+                {% endif %}
+            </div>
+        </div>
     </div>
 
-    <!-- JavaScript -->
-    <script src="{{ asset('js/dashboard.js') }}"></script>
-</body>
-</html>
+    <!-- Graphiques et statistiques -->
+    <div class="charts-section">
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3>Progression hebdomadaire</h3>
+                <select class="chart-select">
+                    <option>Cette semaine</option>
+                    <option>Ce mois</option>
+                    <option>Cette année</option>
+                </select>
+            </div>
+            <div class="chart-container">
+                <canvas id="progressChart"
+                        data-labels="{{ dashboard.weekly_progress.labels|json_encode }}"
+                        data-calories="{{ dashboard.weekly_progress.calories|json_encode }}"
+                        data-distance="{{ dashboard.weekly_progress.distance|json_encode }}">
+                </canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3>Répartition des calories</h3>
+                <div class="chart-legend">
+                    <span class="legend-item"><i class="fas fa-circle" style="color: #4CAF50;"></i> Protéines ({{ dashboard.nutrition.proteins }}%)</span>
+                    <span class="legend-item"><i class="fas fa-circle" style="color: #2196F3;"></i> Glucides ({{ dashboard.nutrition.carbs }}%)</span>
+                    <span class="legend-item"><i class="fas fa-circle" style="color: #FF9800;"></i> Lipides ({{ dashboard.nutrition.fats }}%)</span>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="caloriesChart"
+                        data-proteins="{{ dashboard.nutrition.proteins }}"
+                        data-carbs="{{ dashboard.nutrition.carbs }}"
+                        data-fats="{{ dashboard.nutrition.fats }}">
+                </canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Entraînements et régime -->
+    <div class="workout-diet-section">
+        <div class="workout-plan">
+            <div class="section-header">
+                <h3><i class="fas fa-dumbbell"></i> Entraînement du jour</h3>
+                <a href="#" class="view-all">Voir le planning complet <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <div class="workout-list">
+                {% for workout in dashboard.workouts %}
+                    <div class="workout-item">
+                        <div class="workout-icon">
+                            {% if workout.name == 'Cardio Training' %}
+                                <i class="fas fa-running"></i>
+                            {% elseif workout.name == 'Musculation' %}
+                                <i class="fas fa-dumbbell"></i>
+                            {% elseif workout.name == 'Natation' %}
+                                <i class="fas fa-water"></i>
+                            {% else %}
+                                <i class="fas fa-dumbbell"></i>
+                            {% endif %}
+                        </div>
+                        <div class="workout-details">
+                            <h4>{{ workout.name }}</h4>
+                            <p>{{ workout.duration }} min •
+                            {% if workout.calories is defined %}
+                                Brûle {{ workout.calories }} calories
+                            {% elseif workout.type is defined %}
+                                {{ workout.type }}
+                            {% endif %}
+                            </p>
+                        </div>
+                        <div class="workout-status {{ workout.status }}">
+                            {% if workout.status == 'completed' %}
+                                <i class="fas fa-check"></i>
+                                Terminé
+                            {% elseif workout.status == 'pending' %}
+                                <i class="fas fa-clock"></i>
+                                {{ workout.time }}
+                            {% elseif workout.status == 'upcoming' %}
+                                <i class="fas fa-calendar"></i>
+                                {{ workout.time }}
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="diet-plan">
+            <div class="section-header">
+                <h3><i class="fas fa-utensils"></i> Repas recommandés</h3>
+                <a href="#" class="view-all">Voir le menu complet <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <div class="meal-list">
+                {% for meal in dashboard.meals %}
+                    <div class="meal-item">
+                        <div class="meal-time">{{ meal.time }}</div>
+                        <div class="meal-details">
+                            <h4>{{ meal.name }}</h4>
+                            <p>{{ meal.calories }} kcal • {{ meal.proteins }}g protéines</p>
+                        </div>
+                        <div class="meal-check">
+                            {% if meal.completed %}
+                                <i class="fas fa-check-circle" style="color: #2e7d32;"></i>
+                            {% else %}
+                                <i class="far fa-circle"></i>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Salle de sport et communauté -->
+    <div class="gym-community-section">
+        <div class="gym-card">
+            <div class="section-header">
+                <h3><i class="fas fa-map-marker-alt"></i> Salles de sport proches</h3>
+                <button class="btn-refresh"><i class="fas fa-sync-alt"></i></button>
+            </div>
+
+            <div class="gym-list">
+                <div class="gym-item">
+                    <div class="gym-info">
+                        <h4>Fitness First</h4>
+                        <p><i class="fas fa-map-marker"></i> 1.2 km • Ouvert 24h/24</p>
+                        <div class="gym-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                            <span>4.5 (128 avis)</span>
+                        </div>
+                    </div>
+                    <button class="btn-direction">
+                        <i class="fas fa-directions"></i> Itinéraire
+                    </button>
+                </div>
+
+                <div class="gym-item">
+                    <div class="gym-info">
+                        <h4>Urban Fit Club</h4>
+                        <p><i class="fas fa-map-marker"></i> 2.5 km • Piscine incluse</p>
+                        <div class="gym-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="far fa-star"></i>
+                            <span>4.0 (89 avis)</span>
+                        </div>
+                    </div>
+                    <button class="btn-direction">
+                        <i class="fas fa-directions"></i> Itinéraire
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="community-card">
+            <div class="section-header">
+                <h3><i class="fas fa-users"></i> Communauté active</h3>
+                <a href="{{path('app_communaute')}}" class="view-all">Voir tous <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <div class="community-members">
+                {% set activeUsers = getActiveCommunityUsers(app.user, 5) %}
+                {% if activeUsers is empty %}
+                    <div class="no-active-members">Aucun membre actif pour le moment.</div>
+                {% else %}
+                    {% for member in activeUsers %}
+                        <div class="member">
+                            <img src="{{ member.profileImage ? asset('uploads/profile_images/' ~ member.profileImage) : 'https://randomuser.me/api/portraits/lego/1.jpg' }}" alt="Membre">
+                            <div class="member-info">
+                                <h5>{{ member.fullName }}</h5>
+                                <p>Dernière activité : {{ member.lastActivity ? member.lastActivity|date('H:i') : '' }}</p>
+                            </div>
+                            <button class="btn-follow">Suivre</button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="community-challenge">
+                <h4>Défi du mois: 100km en course</h4>
+                <div class="challenge-progress">
+                    <div class="progress-info">
+                        <span>Votre progression: 42km</span>
+                        <span>42%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 42%"></div>
+                    </div>
+                </div>
+                <button class="btn-challenge">Participer</button>
+            </div>
+        </div>
+    </div>
+{% endblock %}

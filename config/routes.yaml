@@ -9,3 +9,9 @@
 
 controllers:
     resource: routing.controllers
+# Nutritionnistes
+app_nutritionniste:
+    path: /nutritionnistes
+    controller: App\Controller\NutritionnisteController::index
+    methods: GET
+

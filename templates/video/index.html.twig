@@ -1,0 +1,1312 @@
+{# templates/video/index.html.twig #}
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vidéos d'exercices - HEALFIT</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2e7d32;
+            --primary-light: #4caf50;
+            --primary-dark: #1b5e20;
+            --secondary: #ff9800;
+            --accent: #2196f3;
+            --accent-yoga: #9c27b0;
+            --accent-pilates: #009688;
+            --accent-cardio: #f44336;
+            --accent-debutant: #ff9800;
+            --accent-expert: #d32f2f;
+            --light: #f8f9fa;
+            --dark: #212121;
+            --gray: #757575;
+            --light-gray: #f5f5f5;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+            --transition: all 0.3s ease;
+            --radius: 12px;
+            --radius-sm: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            color: var(--dark);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Dashboard Layout */
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            grid-template-rows: 70px 1fr;
+            min-height: 100vh;
+        }
+
+        /* Navbar */
+        .dashboard-navbar {
+            grid-column: 1 / -1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: white;
+            padding: 0 30px;
+            box-shadow: var(--shadow);
+            z-index: 100;
+            position: sticky;
+            top: 0;
+            border-bottom: 3px solid var(--primary-light);
+        }
+
+        .navbar-left, .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .dashboard-logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            gap: 12px;
+        }
+
+        .logo-text {
+            font-weight: 700;
+            font-size: 1.5rem;
+            display: flex;
+        }
+
+        .logo-part1 {
+            color: var(--primary-dark);
+        }
+
+        .logo-part2 {
+            color: var(--secondary);
+        }
+
+        .dashboard-title {
+            font-size: 1.5rem;
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-link:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .nav-link.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .nav-btn {
+            background: linear-gradient(45deg, var(--secondary), #ff8a00);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 152, 0, 0.3);
+        }
+
+        /* Sidebar */
+        .dashboard-sidebar {
+            background-color: white;
+            padding: 20px 0;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            position: sticky;
+            top: 70px;
+            height: calc(100vh - 70px);
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px 20px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .sidebar-header h3 {
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .menu-section {
+            margin-bottom: 25px;
+            padding: 0 20px;
+        }
+
+        .menu-section h4 {
+            color: var(--gray);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 15px;
+            text-decoration: none;
+            color: var(--dark);
+            border-radius: var(--radius-sm);
+            margin-bottom: 5px;
+            transition: var(--transition);
+        }
+
+        .menu-item:hover {
+            background-color: var(--light-gray);
+            color: var(--primary);
+        }
+
+        .menu-item.active {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+
+        .user-progress {
+            margin-bottom: 25px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background-color: var(--light-gray);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-light), var(--primary));
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .premium-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--secondary), #ff8a00);
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .premium-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 152, 0, 0.3);
+        }
+
+        /* Main Content */
+        .dashboard-content {
+            padding: 25px;
+            overflow-y: auto;
+            max-height: calc(100vh - 70px);
+        }
+
+        /* Hero Section */
+        .hero-section {
+            padding: 40px 20px;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(46, 125, 50, 0.1), rgba(76, 175, 80, 0.05));
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            color: var(--primary-dark);
+            margin-bottom: 15px;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+            color: var(--gray);
+            max-width: 700px;
+            margin: 0 auto 30px;
+            line-height: 1.6;
+        }
+
+        .search-container {
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 25px;
+            padding-right: 60px;
+            border: 2px solid var(--primary-light);
+            border-radius: 50px;
+            font-size: 1rem;
+            background: white;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 5px 20px rgba(46, 125, 50, 0.2);
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            background: linear-gradient(45deg, var(--primary), var(--primary-light));
+            color: white;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1.1rem;
+        }
+
+        .search-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Categories Section */
+        .section-title {
+            text-align: center;
+            font-size: 2.2rem;
+            color: var(--primary-dark);
+            margin: 0 0 30px;
+            font-weight: 700;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 50px;
+        }
+
+        .category-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 25px;
+            text-decoration: none;
+            color: var(--dark);
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            border-left: 5px solid;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .category-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .category-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .category-card p {
+            color: var(--gray);
+            margin-bottom: 20px;
+            line-height: 1.5;
+            min-height: 60px;
+        }
+
+        .category-stats {
+            display: flex;
+            justify-content: space-between;
+            color: var(--gray);
+            font-size: 0.85rem;
+            padding-top: 15px;
+            border-top: 1px solid var(--light-gray);
+        }
+
+        .category-stats span {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .category-stats i {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        /* Stats */
+        .stats-section {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: var(--radius);
+            margin: 40px 0 60px;
+            padding: 40px 30px;
+            color: white;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-item h2 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 800;
+        }
+
+        .stat-item p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Videos Section */
+        .videos-section {
+            margin-bottom: 60px;
+        }
+
+        .videos-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .videos-header h2 {
+            font-size: 1.8rem;
+            color: var(--primary-dark);
+            margin: 0;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 18px;
+            border: 2px solid var(--light-gray);
+            background: white;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .videos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        .video-card {
+            background: white;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: var(--dark);
+            display: block;
+        }
+
+        .video-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .video-thumbnail {
+            position: relative;
+            height: 200px;
+            overflow: hidden;
+            background: var(--dark);
+        }
+
+        .video-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .video-card:hover .video-thumbnail img {
+            transform: scale(1.05);
+        }
+
+        .video-duration {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .video-content {
+            padding: 20px;
+        }
+
+        .video-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--dark);
+            line-height: 1.4;
+        }
+
+        .video-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .video-views {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .video-description {
+            color: var(--gray);
+            line-height: 1.5;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            height: 60px;
+            overflow: hidden;
+        }
+
+        .video-category {
+            display: inline-block;
+            background: var(--light-gray);
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .video-level {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .dashboard-container {
+                grid-template-columns: 220px 1fr;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-sidebar {
+                display: none;
+            }
+
+            .dashboard-content {
+                padding: 20px;
+            }
+
+            .hero-title {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-navbar {
+                padding: 0 15px;
+                flex-direction: column;
+                height: auto;
+                padding: 15px;
+                gap: 15px;
+            }
+
+            .nav-links {
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .dashboard-title {
+                display: none;
+            }
+
+            .videos-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+
+            .categories-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .videos-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .filter-buttons {
+                width: 100%;
+                overflow-x: auto;
+                padding-bottom: 10px;
+            }
+
+            .hero-title {
+                font-size: 1.8rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero-section {
+                padding: 30px 15px;
+            }
+
+            .hero-title {
+                font-size: 1.6rem;
+            }
+
+            .section-title {
+                font-size: 1.6rem;
+            }
+
+            .videos-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-section {
+                grid-template-columns: 1fr;
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="dashboard-container">
+    <!-- NAVBAR -->
+    <nav class="dashboard-navbar">
+        <div class="navbar-left">
+            <a href="{{ path('app_dashboard') }}" class="dashboard-logo">
+                <div class="logo-text">
+                    <span class="logo-part1">HEAL</span><span class="logo-part2">FIT</span>
+                </div>
+            </a>
+            <h1 class="dashboard-title">Vidéos d'exercices</h1>
+        </div>
+
+        <div class="navbar-right">
+            <div class="nav-links">
+                <a href="{{ path('app_dashboard') }}" class="nav-link">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+                <a href="{{ path('app_guide_sante') }}" class="nav-link">
+                    <i class="fas fa-book-medical"></i> Guide Santé
+                </a>
+                <a href="{{ path('app_videos_exercices') }}" class="nav-link active">
+                    <i class="fas fa-video"></i> Vidéos
+                </a>
+                <a href="#" class="nav-link">
+                    <i class="fas fa-chart-line"></i> Progrès
+                </a>
+                <button class="nav-btn">
+                    <i class="fas fa-crown"></i> Premium
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- SIDEBAR -->
+    <aside class="dashboard-sidebar">
+        <div class="sidebar-header">
+            <h3><i class="fas fa-user-circle"></i> Mon Espace</h3>
+        </div>
+
+        <div class="menu-section">
+            <h4>MES ACTIVITÉS</h4>
+            <a href="#" class="menu-item">
+                <i class="fas fa-chart-line"></i> Mes progrès
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-bullseye"></i> Mes objectifs
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-award"></i> Mes badges
+            </a>
+        </div>
+
+        <div class="menu-section">
+            <h4>RESSOURCES</h4>
+            <a href="{{ path('app_guide_sante') }}" class="menu-item">
+                <i class="fas fa-book-medical"></i> Guide santé
+            </a>
+            <a href="{{ path('app_videos_exercices') }}" class="menu-item active">
+                <i class="fas fa-video"></i> Vidéos d'exercices
+            </a>
+            <a href="#" class="menu-item">
+                <i class="fas fa-file-alt"></i> Rapports mensuels
+            </a>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="user-progress">
+                <div class="progress-info">
+                    <span>Progression mensuelle</span>
+                    <span>65%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 65%;"></div>
+                </div>
+            </div>
+
+            <button class="premium-btn">
+                <i class="fas fa-crown"></i> Passer à Premium
+            </button>
+        </div>
+    </aside>
+
+    <!-- CONTENU PRINCIPAL -->
+    <main class="dashboard-content">
+        <!-- HERO SECTION -->
+        <section class="hero-section">
+            <h1 class="hero-title">Transformez Votre Santé avec Nos Exercices</h1>
+            <p class="hero-subtitle">
+                Accédez à des centaines de vidéos d'entraînement professionnelles classées par niveau et type d'exercice.
+                Que vous soyez débutant ou expert, trouvez le programme parfait pour vos objectifs.
+            </p>
+
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Rechercher un exercice, un coach, une durée...">
+                <button class="search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- STATS -->
+        <div class="stats-section">
+            <div class="stat-item">
+                <h2>{{ videos|length }}+</h2>
+                <p>Vidéos d'exercices</p>
+            </div>
+            <div class="stat-item">
+                <h2>6</h2>
+                <p>Catégories différentes</p>
+            </div>
+            <div class="stat-item">
+                <h2>500K+</h2>
+                <p>Membres actifs</p>
+            </div>
+            <div class="stat-item">
+                <h2>4.9</h2>
+                <p>Note moyenne</p>
+            </div>
+        </div>
+
+        <!-- CATÉGORIES -->
+        <h2 class="section-title">Catégories Populaires</h2>
+
+        <div class="categories-grid">
+            <!-- Cardio -->
+            <div class="category-card" data-category="cardio" style="border-left-color: var(--accent-cardio);">
+                <div class="category-icon" style="background: linear-gradient(135deg, var(--accent-cardio), #e53935);">
+                    <i class="fas fa-heartbeat"></i>
+                </div>
+                <h3>Cardio Training</h3>
+                <p>Exercices intensifs pour améliorer votre endurance cardiovasculaire et brûler des calories efficacement. Parfait pour la perte de poids.</p>
+                <div class="category-stats">
+                    <span>
+                        <i class="fas fa-video"></i>
+                        <span>45+ vidéos</span>
+                    </span>
+                    <span>
+                        <i class="fas fa-clock"></i>
+                        <span>15-45 min</span>
+                    </span>
+                    <span>
+                        <i class="fas fa-fire"></i>
+                        <span>300-600 cal</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Yoga -->
+            <div class="category-card" data-category="yoga" style="border-left-color: var(--accent-yoga);">
+                <div class="category-icon" style="background: linear-gradient(135deg, var(--accent-yoga), #7b1fa2);">
+                    <i class="fas fa-spa"></i>
+                </div>
+                <h3>Yoga & Méditation</h3>
+                <p>Séances de yoga pour améliorer flexibilité, équilibre et paix intérieure. Idéal pour réduire le stress et améliorer la posture.</p>
+                <div class="category-stats">
+                    <span>
+                        <i class="fas fa-video"></i>
+                        <span>38+ vidéos</span>
+                    </span>
+                    <span>
+                        <i class="fas fa-clock"></i>
+                        <span>20-60 min</span>
+                    </span>
+                    <span>
+                        <i class="fas fa-brain"></i>
+                        <span>Relaxation</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Pilates -->
+            <div class="category-card" data-category="pilates" style="border-left-color: var(--accent-pilates);">
+                <div class="category-icon" style="background: linear-gradient(135deg, var(--accent-pilates), #00796b);">
+                    <i class="fas fa-ring"></i>
+                </div>
+                <h3>Pilates & Posture</h3>
+                <p>Renforcez votre sangle abdominale et améliorez votre posture avec des exercices de Pilates ciblés. Excellent pour le mal de dos.</p>
+                <div class="category-stats">
+                    <span>
+                        <i class="fas fa-video"></i>
+                        <span>32+ vidéos</span>
+                    </span>
+                    <span>
+                        <i class="fas fa-clock"></i>
+                        <span>25-40 min</span>
+                    </span>
+                    <span>
+                        <i class="fas fa-spine"></i>
+                        <span>Posture</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Débutant -->
+            <div class="category-card" data-level="debutant" style="border-left-color: var(--accent-debutant);">
+                <div class="category-icon" style="background: linear-gradient(135deg, var(--accent-debutant), #e68900);">
+                    <i class="fas fa-baby"></i>
+                </div>
+                <h3>Pour Débutants</h3>
+                <p>Programmes progressifs spécialement conçus pour les débutants. Apprenez les bases en douceur avec des exercices adaptés.</p>
+                <div class="category-stats">
+                    <span>
+                        <i class="fas fa-video"></i>
+                        <span>55+ vidéos</span>
+                    </span>
+                    <span>
+                        <i class="fas fa-clock"></i>
+                        <span>10-30 min</span>
+                    </span>
+                    <span>
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>Pédagogique</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Expert -->
+            <div class="category-card" data-level="expert" style="border-left-color: var(--accent-expert);">
+                <div class="category-icon" style="background: linear-gradient(135deg, var(--accent-expert), #b71c1c);">
+                    <i class="fas fa-fire"></i>
+                </div>
+                <h3>Pour Experts</h3>
+                <p>Défis avancés et programmes intensifs pour ceux qui cherchent à repousser leurs limites. Pour athlètes confirmés.</p>
+                <div class="category-stats">
+                    <span>
+                        <i class="fas fa-video"></i>
+                        <span>28+ vidéos</span>
+                    </span>
+                    <span>
+                        <i class="fas fa-clock"></i>
+                        <span>40-60 min</span>
+                    </span>
+                    <span>
+                        <i class="fas fa-bolt"></i>
+                        <span>Intense</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Musculation -->
+            <div class="category-card" data-category="musculation" style="border-left-color: var(--primary);">
+                <div class="category-icon" style="background: linear-gradient(135deg, var(--primary), var(--primary-light));">
+                    <i class="fas fa-dumbbell"></i>
+                </div>
+                <h3>Musculation</h3>
+                <p>Programmes de renforcement musculaire pour développer votre force et votre masse musculaire avec ou sans matériel.</p>
+                <div class="category-stats">
+                    <span>
+                        <i class="fas fa-video"></i>
+                        <span>43+ vidéos</span>
+                    </span>
+                    <span>
+                        <i class="fas fa-clock"></i>
+                        <span>30-50 min</span>
+                    </span>
+                    <span>
+                        <i class="fas fa-weight"></i>
+                        <span>Force</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIDÉOS -->
+        <section class="videos-section">
+            <div class="videos-header">
+                <h2><i class="fas fa-play-circle"></i> Vidéos d'Exercices</h2>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="all">Toutes</button>
+                    <button class="filter-btn" data-filter="debutant">Débutant</button>
+                    <button class="filter-btn" data-filter="intermediaire">Intermédiaire</button>
+                    <button class="filter-btn" data-filter="expert">Expert</button>
+                    <button class="filter-btn" data-filter="cardio">Cardio</button>
+                    <button class="filter-btn" data-filter="yoga">Yoga</button>
+                    <button class="filter-btn" data-filter="pilates">Pilates</button>
+                    <button class="filter-btn" data-filter="musculation">Musculation</button>
+                </div>
+            </div>
+
+            <div class="videos-grid" id="videosContainer">
+                {% for video in videos %}
+                    {% if video.title is not empty and "rick astley" not in video.title|lower and "never gonna give you up" not in video.title|lower %}
+                        {# VIDÉO REMPLACÉE : Rick Astley remplacé par une vraie vidéo d'exercice #}
+                        <a href="https://www.youtube.com/watch?v={{ video.video_id }}"
+                           target="_blank"
+                           class="video-card"
+                           data-category="{{ video.category }}"
+                           data-level="{{ video.level }}">
+                            <div class="video-thumbnail">
+                                {% if "cardio intense pour débutants" in video.title|lower %}
+                                    {# Utiliser une vraie vignette d'exercice cardio #}
+                                    <img src="https://img.youtube.com/vi/dZgVxT6IqmA/hqdefault.jpg" alt="Cardio intense pour débutants">
+                                {% else %}
+                                    <img src="{{ video.thumbnail }}" alt="{{ video.title }}" onerror="this.src='https://img.youtube.com/vi/{{ video.video_id }}/hqdefault.jpg'">
+                                {% endif %}
+                                <div class="video-duration">{{ video.duration }}</div>
+                            </div>
+                            <div class="video-content">
+                                {% if "rick astley" in video.title|lower or "never gonna give you up" in video.title|lower %}
+                                    {# Titre remplacé pour la vidéo Rick Astley #}
+                                    <h3 class="video-title">Cardio intense pour débutants - 20 min</h3>
+                                    <div class="video-meta">
+                                        <div class="video-views">
+                                            <i class="fas fa-eye"></i> 150K
+                                        </div>
+                                        <div>HealFit Coach</div>
+                                    </div>
+                                    <p class="video-description">Session de cardio complète pour brûler des calories efficacement. Parfait pour les débutants.</p>
+                                {% else %}
+                                    <h3 class="video-title">{{ video.title }}</h3>
+                                    <div class="video-meta">
+                                        <div class="video-views">
+                                            <i class="fas fa-eye"></i> {{ video.views }}
+                                        </div>
+                                        <div>{{ video.channel }}</div>
+                                    </div>
+                                    <p class="video-description">{{ video.description }}</p>
+                                {% endif %}
+                                <div>
+                                    {% if "rick astley" in video.title|lower or "never gonna give you up" in video.title|lower %}
+                                        {# Catégorie et niveau fixes pour la vidéo remplacée #}
+                                        <span class="video-category" style="background-color: #ffebee; color: var(--accent-cardio);">
+                                            <i class="fas fa-heartbeat"></i> Cardio
+                                        </span>
+                                        <span class="video-level" style="background-color: #fff3e0; color: var(--accent-debutant);">
+                                            Débutant
+                                        </span>
+                                    {% else %}
+                                        <span class="video-category" style="background-color: {% if video.category == 'cardio' %}#ffebee{% elseif video.category == 'yoga' %}#f3e5f5{% elseif video.category == 'pilates' %}#e0f2f1{% elseif video.category == 'musculation' %}#e8f5e9{% else %}#fff3e0{% endif %}; color: {% if video.category == 'cardio' %}var(--accent-cardio){% elseif video.category == 'yoga' %}var(--accent-yoga){% elseif video.category == 'pilates' %}var(--accent-pilates){% elseif video.category == 'musculation' %}var(--primary){% else %}var(--accent-debutant){% endif %};">
+                                            {% if video.category == 'cardio' %}<i class="fas fa-heartbeat"></i> Cardio
+                                            {% elseif video.category == 'yoga' %}<i class="fas fa-spa"></i> Yoga
+                                            {% elseif video.category == 'pilates' %}<i class="fas fa-ring"></i> Pilates
+                                            {% elseif video.category == 'musculation' %}<i class="fas fa-dumbbell"></i> Musculation
+                                            {% else %}{{ video.category }}
+                                            {% endif %}
+                                        </span>
+                                        <span class="video-level" style="background-color: {% if video.level == 'debutant' %}#fff3e0{% elseif video.level == 'expert' %}#ffebee{% else %}#e3f2fd{% endif %}; color: {% if video.level == 'debutant' %}var(--accent-debutant){% elseif video.level == 'expert' %}var(--accent-expert){% else %}var(--accent){% endif %};">
+                                            {% if video.level == 'debutant' %}Débutant
+                                            {% elseif video.level == 'intermediaire' %}Intermédiaire
+                                            {% else %}Expert
+                                            {% endif %}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </a>
+                    {% endif %}
+                {% endfor %}
+
+                {# VIDÉO AJOUTÉE : Cardio débutant #}
+                <a href="https://www.youtube.com/watch?v=dZgVxT6IqmA"
+                   target="_blank"
+                   class="video-card"
+                   data-category="cardio"
+                   data-level="debutant">
+                    <div class="video-thumbnail">
+                        <img src="https://img.youtube.com/vi/dZgVxT6IqmA/hqdefault.jpg" alt="Cardio débutant - Séance complète">
+                        <div class="video-duration">25:30</div>
+                    </div>
+                    <div class="video-content">
+                        <h3 class="video-title">Cardio Débutant - Séance Complète</h3>
+                        <div class="video-meta">
+                            <div class="video-views">
+                                <i class="fas fa-eye"></i> 320K
+                            </div>
+                            <div>Coach Fitness Pro</div>
+                        </div>
+                        <p class="video-description">Séance de cardio complète pour débutants, adaptée à tous les niveaux. Brûlez des calories en douceur.</p>
+                        <div>
+                            <span class="video-category" style="background-color: #ffebee; color: var(--accent-cardio);">
+                                <i class="fas fa-heartbeat"></i> Cardio
+                            </span>
+                            <span class="video-level" style="background-color: #fff3e0; color: var(--accent-debutant);">
+                                Débutant
+                            </span>
+                        </div>
+                    </div>
+                </a>
+
+                {# NOUVELLE VIDÉO AJOUTÉE : Musculation #}
+                <a href="https://www.youtube.com/watch?v=UyWtwj_gbiE"
+                   target="_blank"
+                   class="video-card"
+                   data-category="musculation"
+                   data-level="intermediaire">
+                    <div class="video-thumbnail">
+                        <img src="https://img.youtube.com/vi/UyWtwj_gbiE/hqdefault.jpg" alt="Séance musculation complète">
+                        <div class="video-duration">35:15</div>
+                    </div>
+                    <div class="video-content">
+                        <h3 class="video-title">Séance Musculation Complète - Haut du Corps</h3>
+                        <div class="video-meta">
+                            <div class="video-views">
+                                <i class="fas fa-eye"></i> 480K
+                            </div>
+                            <div>Coach Muscu Pro</div>
+                        </div>
+                        <p class="video-description">Séance intensive de musculation pour développer le haut du corps. Exercices avec et sans matériel.</p>
+                        <div>
+                            <span class="video-category" style="background-color: #e8f5e9; color: var(--primary);">
+                                <i class="fas fa-dumbbell"></i> Musculation
+                            </span>
+                            <span class="video-level" style="background-color: #e3f2fd; color: var(--accent);">
+                                Intermédiaire
+                            </span>
+                        </div>
+                    </div>
+                </a>
+
+                {# AUTRE VIDÉO DE MUSCULATION AJOUTÉE #}
+                <a href="https://www.youtube.com/watch?v=IODxDxX7oi4"
+                   target="_blank"
+                   class="video-card"
+                   data-category="musculation"
+                   data-level="debutant">
+                    <div class="video-thumbnail">
+                        <img src="https://img.youtube.com/vi/IODxDxX7oi4/hqdefault.jpg" alt="Musculation débutant sans matériel">
+                        <div class="video-duration">28:45</div>
+                    </div>
+                    <div class="video-content">
+                        <h3 class="video-title">Musculation Débutant - Sans Matériel</h3>
+                        <div class="video-meta">
+                            <div class="video-views">
+                                <i class="fas fa-eye"></i> 520K
+                            </div>
+                            <div>HealFit Coach</div>
+                        </div>
+                        <p class="video-description">Programme complet de musculation pour débutants sans équipement. Renforcez tous vos groupes musculaires.</p>
+                        <div>
+                            <span class="video-category" style="background-color: #e8f5e9; color: var(--primary);">
+                                <i class="fas fa-dumbbell"></i> Musculation
+                            </span>
+                            <span class="video-level" style="background-color: #fff3e0; color: var(--accent-debutant);">
+                                Débutant
+                            </span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </section>
+        <!-- Le footer a été supprimé comme demandé -->
+    </main>
+</div>
+
+<script>
+    // Filtres interactifs
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+
+            const filter = this.dataset.filter;
+            filterContent(filter);
+        });
+    });
+
+    function filterContent(filter) {
+        const videoCards = document.querySelectorAll('.video-card');
+        const categoryCards = document.querySelectorAll('.category-card');
+
+        if (filter === 'all') {
+            videoCards.forEach(card => {
+                card.style.display = 'block';
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 10);
+            });
+
+            categoryCards.forEach(card => {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            });
+
+            return;
+        }
+
+        let visibleVideos = 0;
+        videoCards.forEach(card => {
+            const category = card.dataset.category;
+            const level = card.dataset.level;
+
+            if (category === filter || level === filter) {
+                card.style.display = 'block';
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 10);
+                visibleVideos++;
+            } else {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(10px)';
+                setTimeout(() => {
+                    card.style.display = 'none';
+                }, 300);
+            }
+        });
+
+        categoryCards.forEach(card => {
+            const category = card.dataset.category;
+            const level = card.dataset.level;
+
+            if (category === filter || level === filter) {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(-5px)';
+                card.style.boxShadow = 'var(--shadow-lg)';
+            } else {
+                card.style.opacity = '0.5';
+                card.style.transform = 'translateY(0)';
+                card.style.boxShadow = 'var(--shadow)';
+            }
+        });
+    }
+
+    // Recherche
+    document.querySelector('.search-btn').addEventListener('click', performSearch);
+    document.querySelector('.search-input').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            performSearch();
+        }
+    });
+
+    function performSearch() {
+        const query = document.querySelector('.search-input').value.toLowerCase();
+        const videoCards = document.querySelectorAll('.video-card');
+        const categoryCards = document.querySelectorAll('.category-card');
+
+        if (query.trim() === '') {
+            videoCards.forEach(card => {
+                card.style.display = 'block';
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                }, 10);
+            });
+            categoryCards.forEach(card => {
+                card.style.opacity = '1';
+            });
+            return;
+        }
+
+        videoCards.forEach(card => {
+            const title = card.querySelector('.video-title').textContent.toLowerCase();
+            const description = card.querySelector('.video-description').textContent.toLowerCase();
+
+            if (title.includes(query) || description.includes(query)) {
+                card.style.display = 'block';
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.animation = 'pulse 0.5s ease';
+                }, 10);
+            } else {
+                card.style.opacity = '0';
+                setTimeout(() => {
+                    card.style.display = 'none';
+                }, 300);
+            }
+        });
+
+        categoryCards.forEach(card => {
+            const title = card.querySelector('h3').textContent.toLowerCase();
+            const description = card.querySelector('p').textContent.toLowerCase();
+
+            if (title.includes(query) || description.includes(query)) {
+                card.style.opacity = '1';
+                card.style.animation = 'pulse 0.5s ease';
+            } else {
+                card.style.opacity = '0.3';
+            }
+        });
+    }
+
+    // Animation au survol
+    document.querySelectorAll('.category-card, .video-card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            if (this.querySelector('img')) {
+                this.querySelector('img').style.transform = 'scale(1.05)';
+            }
+        });
+
+        card.addEventListener('mouseleave', function() {
+            if (this.querySelector('img')) {
+                this.querySelector('img').style.transform = 'scale(1)';
+            }
+        });
+    });
+
+    // Filtrer au clic sur les catégories
+    document.querySelectorAll('.category-card').forEach(card => {
+        card.addEventListener('click', function(e) {
+            e.preventDefault();
+            const category = this.dataset.category;
+            const level = this.dataset.level;
+
+            let filter = category || level;
+            if (filter) {
+                const filterBtn = document.querySelector(`.filter-btn[data-filter="${filter}"]`);
+                if (filterBtn) {
+                    filterBtn.click();
+                } else {
+                    if (category) {
+                        const similarBtn = document.querySelector(`.filter-btn[data-filter*="${category}"]`);
+                        if (similarBtn) similarBtn.click();
+                    }
+                }
+
+                document.querySelector('.videos-section').scrollIntoView({
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+
+    // Initialisation
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Page chargée avec', document.querySelectorAll('.video-card').length, 'vidéos d\'exercices');
+    });
+</script>
+</body>
+</html>

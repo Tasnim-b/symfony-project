@@ -3,6 +3,8 @@
 namespace App\Controller\Admin;
 
 use App\Entity\User;
+use App\Entity\Article;
+use App\Entity\Nutritionniste;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -31,11 +33,18 @@ class DashboardController extends AbstractDashboardController
         // return $this->render('some/path/my-dashboard.html.twig');
     }
 
+    // public function configureDashboard(): Dashboard
+    // {
+    //     return Dashboard::new()
+    //         ->setTitle('<span class="text-primary font-weight-bold">HealthFit</span> Admin')
+    //         ->setFaviconPath('favicon.ico');
+    // }
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-            ->setTitle('<span class="text-primary font-weight-bold">HealthFit</span> Admin')
-            ->setFaviconPath('favicon.ico');
+            ->setTitle('<span class="text-primary">Health</span><span class="text-secondary">Fit</span> Admin')
+            ->setFaviconPath('build/images/favicon-admin.ico')
+            ->renderSidebarMinimized(false);
     }
 
     public function configureAssets(): \EasyCorp\Bundle\EasyAdminBundle\Config\Assets
@@ -48,5 +57,24 @@ class DashboardController extends AbstractDashboardController
     {
         yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
         yield MenuItem::linkToCrud('Utilisateurs', 'fas fa-users', User::class);
+        yield MenuItem::linkToCrud('Articles', 'fas fa-newspaper', Article::class);
+        yield MenuItem::linkToCrud('Nutritionnistes', 'fas fa-user-md', Nutritionniste::class);
+    }
+
+    public function configureUserMenu(\Symfony\Component\Security\Core\User\UserInterface $user): \EasyCorp\Bundle\EasyAdminBundle\Config\UserMenu
+    {
+        if (!$user instanceof User) {
+            return parent::configureUserMenu($user);
+        }
+
+        return parent::configureUserMenu($user)
+            ->setName($user->getFullName())
+            ->setAvatarUrl($user->getProfileImageUrl());
+        // ->addMenuItems([
+        //     MenuItem::linkToRoute('Mon Profil', 'fa fa-id-card', '...', ['...' => '...']),
+        //     MenuItem::linkToRoute('Paramètres', 'fa fa-user-cog', '...', ['...' => '...']),
+        //     MenuItem::section(),
+        //     MenuItem::linkToLogout('Déconnexion', 'fa fa-sign-out'),
+        // ]);
     }
 }
