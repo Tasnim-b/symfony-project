@@ -55,13 +55,13 @@
                 <div class="user-profile-dropdown">
                     <div class="user-avatar" id="userMenuTrigger">
                         {% if app.user and app.user.profileImage %}
-                            <img src="{{ asset('uploads/profile_images/' ~ app.user.profileImage) }}"
-                                alt="Photo de profil"
+                            <img src="{{ asset('uploads/profile_images/' ~ app.user.profileImage) }}" 
+                                alt="Photo de profil" 
                                 class="profile-img"
                                 onerror="this.src='{{ asset('assets/images/default-avatar.jpg') }}'">
                         {% else %}
-                            <img src="{{ asset('assets/images/default-avatar.jpg') }}"
-                                alt="Photo de profil"
+                            <img src="{{ asset('assets/images/default-avatar.jpg') }}" 
+                                alt="Photo de profil" 
                                 class="profile-img">
                         {% endif %}
                         <span>{{ app.user ? app.user.fullName : 'Invité' }}</span>
@@ -71,13 +71,13 @@
                     <div class="dropdown-menu" id="userMenu">
                         <div class="user-info">
                             {% if app.user and app.user.profileImage %}
-                                <img src="{{ asset('uploads/profile_images/' ~ app.user.profileImage) }}"
-                                    alt="Photo de profil"
+                                <img src="{{ asset('uploads/profile_images/' ~ app.user.profileImage) }}" 
+                                    alt="Photo de profil" 
                                     class="menu-profile-img"
                                     onerror="this.src='{{ asset('assets/images/default-avatar.jpg') }}'">
                             {% else %}
-                                <img src="{{ asset('assets/images/default-avatar.jpg') }}"
-                                    alt="Photo de profil"
+                                <img src="{{ asset('assets/images/default-avatar.jpg') }}" 
+                                    alt="Photo de profil" 
                                     class="menu-profile-img">
                             {% endif %}
                             <div class="user-details">
@@ -137,13 +137,13 @@
                 <div class="menu-section">
                     <h4>Santé & Fitness</h4>
 
-                    <a href="#" class="menu-item">
+                    <a href="{{ path('diet_plan') }}" class="menu-item {% if app.request.get('_route') in ['diet_plan', 'diet_results'] %}active{% endif %}">
                         <i class="fas fa-utensils"></i>
                         <span>Régime alimentaire</span>
                         <span class="badge">Nouveau</span>
                     </a>
 
-                    <a href="#" class="menu-item">
+                    <a href="{{ path('app_workout_personalized') }}" class="menu-item {% if app.request.get('_route') in ['app_workout_personalized', 'app_workout_show'] %}active{% endif %}">
                         <i class="fas fa-dumbbell"></i>
                         <span>Workout personnalisé</span>
                     </a>
