@@ -37,7 +37,7 @@ final class LoginController extends AbstractController
     //     return $this->redirectToRoute('app_login');
     // }
 
-    #[Route('/logout', name: 'app_logout', methods: ['POST'])]
+    #[Route('/logout', name: 'app_logout', methods: ['GET', 'POST'])]
     public function logout(): void
     {
         // Symfony gère automatiquement la déconnexion
@@ -46,7 +46,7 @@ final class LoginController extends AbstractController
 
 
 
-     #[Route('/forgot-password', name: 'app_forgot_password', methods: ['GET'])]
+    #[Route('/forgot-password', name: 'app_forgot_password', methods: ['GET'])]
     public function forgotPassword(): Response
     {
         // Pour l'instant, redirigez vers la page de connexion

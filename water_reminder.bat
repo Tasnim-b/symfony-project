@@ -1,6 +1,6 @@
 @echo off
 chcp 65001 > nul
-set PROJECT_PATH=C:\Users\benma\OneDrive\Bureau\healfit2.0\symfony-project
+set PROJECT_PATH=C:\Users\benma\OneDrive\Bureau\finaaaaaaaaalsymfony\symfony-project
 set PHP_PATH=C:\xampp\php\php.exe
 set LOG_FILE=%PROJECT_PATH%\var\log\water_reminder.log
 

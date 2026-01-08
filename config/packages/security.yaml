@@ -32,7 +32,8 @@ security:
                 login_path: app_login
                 check_path: app_login
                 enable_csrf: true
-                default_target_path: app_dashboard
+                # default_target_path: app_dashboard
+                success_handler: App\Security\AuthenticationSuccessHandler
                 username_parameter: email
                 password_parameter: password
                 csrf_parameter: '_csrf_token'

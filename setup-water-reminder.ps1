@@ -22,7 +22,7 @@ if (-not $principalCheck.IsInRole([Security.Principal.WindowsBuiltInRole]::Admin
 # -------------------------------
 # 2. Chemins du projet
 # -------------------------------
-$projectPath = "C:\Users\benma\OneDrive\Bureau\healfit2.0\symfony-project"
+$projectPath = "C:\Users\benma\OneDrive\Bureau\finaaaaaaaaalsymfony\symfony-project"
 $phpPath = ""
 
 $possiblePhpPaths = @(
