@@ -1,0 +1,405 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Résultats de Votre Plan Nutritionnel - HealthFit{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        :root {
+            --primary: #2e7d32;
+            --primary-light: #4caf50;
+            --primary-dark: #1b5e20;
+            --secondary: #ff9800;
+            --accent: #2196f3;
+            --light: #f8f9fa;
+            --dark: #212121;
+            --gray: #757575;
+            --light-gray: #f5f5f5;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+            --transition: all 0.3s ease;
+            --radius: 12px;
+            --radius-sm: 8px;
+        }
+
+        .results-container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .results-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 40px;
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            color: white;
+            border-radius: var(--radius);
+        }
+
+        .results-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .results-header .date {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 25px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--secondary);
+        }
+
+        .summary-card .value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .summary-card .label {
+            color: var(--gray);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .macros-section {
+            background: var(--light-gray);
+            padding: 30px;
+            border-radius: var(--radius);
+            margin-bottom: 40px;
+        }
+
+        .macro-bar {
+            display: flex;
+            height: 40px;
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 20px 0;
+            box-shadow: var(--shadow);
+        }
+
+        .macro-protein {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .macro-carbs {
+            background: #2196F3;
+            color: white;
+        }
+
+        .macro-fat {
+            background: #FF9800;
+            color: white;
+        }
+
+        .macro-segment {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .meal-plan {
+            margin-bottom: 40px;
+        }
+
+        .meal-card {
+            background: white;
+            padding: 25px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            border-left: 5px solid var(--secondary);
+        }
+
+        .meal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .meal-time {
+            background: var(--primary);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .meal-calories {
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        .suggestions-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .suggestions-list li {
+            padding: 10px 0;
+            border-bottom: 1px dashed #ddd;
+            display: flex;
+            align-items: center;
+        }
+
+        .suggestions-list li:before {
+            content: "✓";
+            color: var(--primary);
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .recommendations {
+            background: linear-gradient(135deg, rgba(255, 152, 0, 0.1), rgba(76, 175, 80, 0.1));
+            padding: 30px;
+            border-radius: var(--radius);
+            margin-bottom: 40px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 40px;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: var(--transition);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--secondary), #ff8a00);
+            color: white;
+            border: none;
+        }
+
+        .btn-secondary {
+            background: var(--primary);
+            color: white;
+            border: none;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        @media (max-width: 768px) {
+            .results-container {
+                margin: 20px;
+            }
+
+            .results-header {
+                padding: 30px 20px;
+            }
+
+            .results-header h1 {
+                font-size: 2rem;
+            }
+
+            .summary-cards {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="results-container">
+        <!-- En-tête -->
+        <div class="results-header">
+            <h1>🎉 Votre Plan Nutritionnel Personnalisé</h1>
+            <p class="date">Généré le {{ dietPlan.createdAt|date('d/m/Y à H:i') }}</p>
+        </div>
+
+        <!-- Résumé -->
+        <div class="summary-cards">
+            <div class="summary-card">
+                <div class="value">{{ dietPlan.summary.dailyCalories }} kcal</div>
+                <div class="label">Calories quotidiennes</div>
+            </div>
+            <div class="summary-card">
+                <div class="value">{{ dietPlan.summary.goal }}</div>
+                <div class="label">Objectif</div>
+            </div>
+            <div class="summary-card">
+                <div class="value">{{ dietPlan.summary.activityLevel }}</div>
+                <div class="label">Niveau d'activité</div>
+            </div>
+            <div class="summary-card">
+                <div class="value">{{ dietPlan.recommendations.mealFrequency|split(' ')|first }}</div>
+                <div class="label">Repas par jour</div>
+            </div>
+        </div>
+
+        <!-- Macros -->
+        <div class="macros-section">
+            <h2>📊 Répartition des Macronutriments</h2>
+            <p>Voici la répartition optimale pour votre objectif</p>
+
+            <div class="macro-bar">
+                {% set proteinWidth = dietPlan.macros.protein.percentage %}
+                {% set carbsWidth = dietPlan.macros.carbs.percentage %}
+                {% set fatWidth = dietPlan.macros.fat.percentage %}
+
+                <div class="macro-segment macro-protein" style="width: {{ proteinWidth }}%">
+                    {{ proteinWidth|round }}%
+                </div>
+                <div class="macro-segment macro-carbs" style="width: {{ carbsWidth }}%">
+                    {{ carbsWidth|round }}%
+                </div>
+                <div class="macro-segment macro-fat" style="width: {{ fatWidth }}%">
+                    {{ fatWidth|round }}%
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+                <div style="text-align: center;">
+                    <div style="font-weight: 700; color: #4CAF50; font-size: 1.2rem;">
+                        {{ dietPlan.macros.protein.grams }}g
+                    </div>
+                    <div style="color: var(--gray); font-size: 0.9rem;">Protéines</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-weight: 700; color: #2196F3; font-size: 1.2rem;">
+                        {{ dietPlan.macros.carbs.grams }}g
+                    </div>
+                    <div style="color: var(--gray); font-size: 0.9rem;">Glucides</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-weight: 700; color: #FF9800; font-size: 1.2rem;">
+                        {{ dietPlan.macros.fat.grams }}g
+                    </div>
+                    <div style="color: var(--gray); font-size: 0.9rem;">Lipides</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Plan des repas -->
+        <div class="meal-plan">
+            <h2>🍽️ Plan des Repas Quotidiens</h2>
+            <p>Voici votre programme alimentaire personnalisé pour la journée :</p>
+
+            {% for meal in dietPlan.mealPlan %}
+                <div class="meal-card">
+                    <div class="meal-header">
+                        <h3 style="margin: 0;">{{ meal.name }}</h3>
+                        <div class="meal-time">{{ meal.time }}</div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <span style="font-weight: 600;">Calories :</span> {{ meal.calories }} kcal
+                        </div>
+                        <div>
+                            <span style="font-weight: 600;">Protéines :</span> {{ meal.protein_grams }}g
+                        </div>
+                        <div>
+                            <span style="font-weight: 600;">Glucides :</span> {{ meal.carbs_grams }}g
+                        </div>
+                        <div>
+                            <span style="font-weight: 600;">Lipides :</span> {{ meal.fat_grams }}g
+                        </div>
+                    </div>
+
+                    {% if meal.tips %}
+                        <div style="background: rgba(255, 152, 0, 0.1); padding: 10px; border-radius: 8px; margin-bottom: 15px;">
+                            <span style="font-weight: 600; color: var(--secondary);">💡 Conseil :</span> {{ meal.tips }}
+                        </div>
+                    {% endif %}
+
+                    <h4 style="margin-bottom: 10px;">Suggestions :</h4>
+                    <ul class="suggestions-list">
+                        {% for suggestion in meal.suggestions %}
+                            <li>{{ suggestion }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Recommandations -->
+        <div class="recommendations">
+            <h2>💡 Recommandations Personnalisées</h2>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px;">
+                <div style="background: white; padding: 20px; border-radius: 10px;">
+                    <h3 style="color: var(--primary); margin-top: 0;">💧 Hydratation</h3>
+                    <p>Consommation actuelle : <strong>{{ dietPlan.recommendations.hydration.current }}L/jour</strong></p>
+                    <p>Recommandation : <strong>{{ dietPlan.recommendations.hydration.recommended }}L/jour</strong></p>
+                    <p>{{ dietPlan.recommendations.hydration.tips }}</p>
+                </div>
+
+                <div style="background: white; padding: 20px; border-radius: 10px;">
+                    <h3 style="color: var(--primary); margin-top: 0;">🕐 Fréquence des repas</h3>
+                    <p>{{ dietPlan.recommendations.mealFrequency }}</p>
+                </div>
+
+                <div style="background: white; padding: 20px; border-radius: 10px;">
+                    <h3 style="color: var(--primary); margin-top: 0;">🌟 Conseils pratiques</h3>
+                    <ul style="padding-left: 20px;">
+                        {% for tip in dietPlan.recommendations.tips %}
+                            <li style="margin-bottom: 8px;">{{ tip }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Boutons d'action -->
+        <div class="action-buttons">
+            <a href="{{ path('diet_plan') }}" class="btn btn-secondary">
+                <i class="fas fa-redo"></i> Recréer un plan
+            </a>
+            <button onclick="window.print()" class="btn btn-primary">
+                <i class="fas fa-print"></i> Imprimer le plan
+            </button>
+        </div>
+    </div>
+{% endblock %}

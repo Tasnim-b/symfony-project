@@ -1,17 +1,142 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        {% block stylesheets %}
-        {% endblock %}
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}HealthFit - Santé & Fitness{% endblock %}</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
 
-        {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
-        {% endblock %}
-    </head>
-    <body>
-        {% block body %}{% endblock %}
-    </body>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    {% block stylesheets %}
+        <style>
+            :root {
+                --primary: #2e7d32;
+                --primary-light: #4caf50;
+                --primary-dark: #1b5e20;
+                --secondary: #ff9800;
+                --accent: #2196f3;
+                --light: #f8f9fa;
+                --dark: #212121;
+                --gray: #757575;
+                --light-gray: #f5f5f5;
+                --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+                --transition: all 0.3s ease;
+                --radius: 12px;
+                --radius-sm: 8px;
+            }
+
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            }
+
+            body {
+                background-color: #f0f2f5;
+                color: var(--dark);
+            }
+        </style>
+    {% endblock %}
+
+    {% block javascripts %}
+        {% block importmap %}{{ importmap('app') }}{% endblock %}
+    {% endblock %}
+</head>
+<body>
+{% block body %}
+    <!-- Structure par défaut si aucun block body n'est défini dans les templates enfants -->
+    <div style="text-align: center; padding: 50px;">
+        <h1>HealthFit - Santé & Fitness</h1>
+        <p>Bienvenue sur votre application de santé personnalisée</p>
+    </div>
+{% endblock %}
+
+<!-- Scripts communs -->
+<script>
+    // Gestion du dropdown utilisateur
+    document.addEventListener('DOMContentLoaded', function() {
+        const userMenuTrigger = document.getElementById('userMenuTrigger');
+        const userMenu = document.getElementById('userMenu');
+
+        if (userMenuTrigger && userMenu) {
+            userMenuTrigger.addEventListener('click', function(e) {
+                e.stopPropagation();
+                userMenu.style.opacity = userMenu.style.opacity === '1' ? '0' : '1';
+                userMenu.style.visibility = userMenu.style.visibility === 'visible' ? 'hidden' : 'visible';
+                userMenu.style.transform = userMenu.style.transform === 'translateY(0px)' ? 'translateY(-10px)' : 'translateY(0px)';
+            });
+
+            // Fermer le menu en cliquant à l'extérieur
+            document.addEventListener('click', function() {
+                userMenu.style.opacity = '0';
+                userMenu.style.visibility = 'hidden';
+                userMenu.style.transform = 'translateY(-10px)';
+            });
+        }
+
+        // Gestion du chatbot
+        const openChatbot = document.getElementById('openChatbot');
+        const closeChatbot = document.getElementById('closeChatbot');
+        const chatbotWidget = document.getElementById('chatbotWidget');
+
+        if (openChatbot && chatbotWidget) {
+            openChatbot.addEventListener('click', function() {
+                chatbotWidget.classList.toggle('active');
+            });
+        }
+
+        if (closeChatbot && chatbotWidget) {
+            closeChatbot.addEventListener('click', function() {
+                chatbotWidget.classList.remove('active');
+            });
+        }
+
+        // Envoyer un message dans le chatbot
+        const sendMessage = document.getElementById('sendMessage');
+        const chatbotInput = document.getElementById('chatbotInput');
+        const chatbotMessages = document.getElementById('chatbotMessages');
+
+        if (sendMessage && chatbotInput && chatbotMessages) {
+            sendMessage.addEventListener('click', function() {
+                const message = chatbotInput.value.trim();
+                if (message) {
+                    // Ajouter le message de l'utilisateur
+                    const userMessage = document.createElement('div');
+                    userMessage.className = 'message user';
+                    userMessage.innerHTML = `
+                                <div class="message-content">${message}</div>
+                                <div class="message-time">Maintenant</div>
+                            `;
+                    chatbotMessages.appendChild(userMessage);
+
+                    // Réponse automatique du bot
+                    setTimeout(() => {
+                        const botMessage = document.createElement('div');
+                        botMessage.className = 'message bot';
+                        botMessage.innerHTML = `
+                                    <div class="message-content">Merci pour votre message ! Comment puis-je vous aider avec votre santé et fitness aujourd'hui ?</div>
+                                    <div class="message-time">Maintenant</div>
+                                `;
+                        chatbotMessages.appendChild(botMessage);
+                        chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+                    }, 1000);
+
+                    chatbotInput.value = '';
+                    chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+                }
+            });
+
+            // Envoyer avec la touche Entrée
+            chatbotInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage.click();
+                }
+            });
+        }
+    });
+</script>
+</body>
 </html>

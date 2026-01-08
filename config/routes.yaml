@@ -9,9 +9,34 @@
 
 controllers:
     resource: routing.controllers
+
 # Nutritionnistes
 app_nutritionniste:
     path: /nutritionnistes
     controller: App\Controller\NutritionnisteController::index
     methods: GET
 
+# config/routes.yaml
+app_diet_form:
+    path: /diet-form
+    controller: App\Controller\DietController::dietForm
+    methods: [GET, POST]
+
+app_diet_results:
+    path: /diet-results/{id}
+    controller: App\Controller\DietController::dietResults
+    methods: [GET]
+
+app_my_diet_plans:
+    path: /my-diet-plans
+    controller: App\Controller\DietController::myDietPlans
+    methods: [GET]
+    
+app_workout_personalized:
+        path: /workout/personnalise
+        controller: App\Controller\WorkoutController::index
+        methods: [ GET, POST ]
+app_workout_show:
+        path: /workout/mon-programme/{id}
+        controller: App\Controller\WorkoutController::show
+        methods: [ GET ]

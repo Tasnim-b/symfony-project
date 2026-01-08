@@ -1,0 +1,936 @@
+{# templates/workout/index.html.twig #}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workout Personnalisé - Healfit</title>
+    <style>
+        :root {
+            --orange-primary: #FF6B35;
+            --green-primary: #2E8B57;
+            --green-light: #3CB371;
+            --gray-light: #F8F9FA;
+            --gray-medium: #E9ECEF;
+            --gray-dark: #6C757D;
+            --white: #FFFFFF;
+            --black: #212529;
+            --blue-light: #e3f2fd;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea0d, #764ba20d);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--white);
+            border-radius: 25px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        /* HEADER */
+        .header {
+            background: linear-gradient(135deg, var(--green-primary), var(--green-light));
+            color: white;
+            padding: 50px 40px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            font-weight: 800;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* STEPS - NAVIGATION PAR ONGLETS */
+        .steps-container {
+            display: flex;
+            justify-content: center;
+            padding: 0;
+            background: var(--white);
+            border-bottom: 2px solid var(--gray-light);
+        }
+
+        .step {
+            text-align: center;
+            flex: 1;
+            padding: 25px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 4px solid transparent;
+            position: relative;
+        }
+
+        .step:hover {
+            background: var(--gray-light);
+        }
+
+        .step.active {
+            background: var(--white);
+            border-bottom: 4px solid var(--orange-primary);
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: var(--gray-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--gray-dark);
+            margin: 0 auto 10px;
+            transition: all 0.3s ease;
+        }
+
+        .step.active .step-number {
+            background: var(--orange-primary);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .step-label {
+            font-weight: 600;
+            color: var(--gray-dark);
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .step.active .step-label {
+            color: var(--orange-primary);
+        }
+
+        /* FORM SECTIONS */
+        .form-sections {
+            padding: 40px;
+        }
+
+        .form-section {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            color: var(--green-primary);
+            font-size: 1.6rem;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--orange-primary);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .section-description {
+            color: var(--gray-dark);
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            padding: 15px 20px;
+            background: var(--blue-light);
+            border-radius: 12px;
+            border-left: 4px solid var(--green-primary);
+        }
+
+        /* FORM GROUPS */
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 12px;
+            color: var(--black);
+            font-weight: 600;
+            font-size: 1.05rem;
+            padding-left: 8px;
+            border-left: 4px solid var(--green-primary);
+        }
+
+        /* RADIO BUTTONS */
+        .radio-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .radio-option {
+            flex: 1;
+        }
+
+        .radio-option input[type="radio"] {
+            display: none;
+        }
+
+        .radio-option label {
+            display: block;
+            padding: 18px 15px;
+            background: var(--gray-light);
+            border: 2px solid var(--gray-medium);
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--gray-dark);
+            font-weight: 500;
+            border-left: none;
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        .radio-option input[type="radio"]:checked + label {
+            background: linear-gradient(135deg, var(--green-primary), var(--green-light));
+            color: white;
+            border-color: transparent;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(46, 139, 87, 0.3);
+        }
+
+        /* CHECKBOXES */
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .checkbox-group {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .checkbox-option {
+            position: relative;
+        }
+
+        .checkbox-option input[type="checkbox"] {
+            display: none;
+        }
+
+        .checkbox-option label {
+            display: block;
+            padding: 18px 15px;
+            background: var(--gray-light);
+            border: 2px solid var(--gray-medium);
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--gray-dark);
+            font-weight: 500;
+            border-left: none;
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        .checkbox-option input[type="checkbox"]:checked + label {
+            background: linear-gradient(135deg, var(--orange-primary), #FF8C42);
+            color: white;
+            border-color: transparent;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 107, 53, 0.3);
+        }
+
+        /* INPUTS */
+        .form-control {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid var(--gray-medium);
+            border-radius: 12px;
+            font-size: 1rem;
+            color: var(--black);
+            background: var(--white);
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--green-primary);
+            box-shadow: 0 0 0 4px rgba(46, 139, 87, 0.1);
+        }
+
+        /* SLIDER */
+        .slider-container {
+            padding: 20px 0;
+        }
+
+        .slider-with-value {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        .slider-value {
+            font-weight: bold;
+            font-size: 1.3rem;
+            min-width: 40px;
+            text-align: center;
+            color: var(--orange-primary);
+            background: var(--white);
+            padding: 8px 15px;
+            border-radius: 8px;
+            border: 3px solid var(--orange-primary);
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.2);
+        }
+
+        .stress-slider {
+            flex: 1;
+            height: 10px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: linear-gradient(to right, #2E8B57, #FFA500, #FF6B35);
+            border-radius: 5px;
+            outline: none;
+        }
+
+        .stress-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--orange-primary);
+            cursor: pointer;
+            border: 4px solid white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            font-weight: 600;
+        }
+
+        .slider-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            color: var(--gray-dark);
+        }
+
+        /* NAVIGATION BUTTONS */
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid var(--gray-light);
+        }
+
+        .btn-nav {
+            padding: 15px 35px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-prev {
+            background: var(--gray-light);
+            color: var(--gray-dark);
+        }
+
+        .btn-prev:hover {
+            background: var(--gray-medium);
+            transform: translateX(-5px);
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, var(--green-primary), var(--green-light));
+            color: white;
+        }
+
+        .btn-next:hover {
+            transform: translateX(5px);
+            box-shadow: 0 8px 25px rgba(46, 139, 87, 0.3);
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, var(--orange-primary), #FF8C42);
+            color: white;
+            padding: 18px 50px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 8px 25px rgba(255, 107, 53, 0.3);
+            margin-top: 40px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(255, 107, 53, 0.4);
+            background: linear-gradient(135deg, #FF8C42, var(--orange-primary));
+        }
+
+        /* PROGRESS BAR */
+        .progress-container {
+            padding: 0 40px 20px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--gray-light);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--green-primary), var(--green-light));
+            width: 25%;
+            transition: width 0.5s ease;
+        }
+
+        .progress-text {
+            text-align: right;
+            color: var(--gray-dark);
+            font-size: 0.9rem;
+            margin-top: 8px;
+        }
+
+        /* FOOTER */
+        .footer-note {
+            text-align: center;
+            padding: 25px;
+            color: var(--gray-dark);
+            font-size: 0.95rem;
+            background: var(--gray-light);
+            border-top: 1px solid var(--gray-medium);
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .header {
+                padding: 30px 20px;
+            }
+
+            .header h1 {
+                font-size: 2.2rem;
+            }
+
+            .step {
+                padding: 15px 10px;
+            }
+
+            .step-label {
+                font-size: 0.8rem;
+            }
+
+            .form-sections {
+                padding: 30px 20px;
+            }
+
+            .radio-group {
+                flex-direction: column;
+            }
+
+            .navigation-buttons {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .btn-nav {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* VALIDATION */
+        .form-error {
+            color: #dc3545;
+            font-size: 0.9rem;
+            margin-top: 8px;
+            padding-left: 8px;
+        }
+
+        /* ICONS */
+        .icon {
+            font-size: 1.3em;
+            margin-right: 8px;
+        }
+
+        /* REQUIRED INDICATOR */
+        .required::after {
+            content: ' *';
+            color: var(--orange-primary);
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- HEADER -->
+    <div class="header">
+        <h1>🏋️‍♂️ WORKOUT PERSONNALISÉ</h1>
+        <p>Créez votre programme d'entraînement sur mesure en 4 étapes simples. Notre algorithme analysera vos réponses pour concevoir le programme parfait pour vous.</p>
+    </div>
+
+    <!-- STEPS NAVIGATION -->
+    <div class="steps-container">
+        <div class="step active" data-step="1">
+            <div class="step-number">1</div>
+            <div class="step-label">PROFIL</div>
+        </div>
+        <div class="step" data-step="2">
+            <div class="step-number">2</div>
+            <div class="step-label">OBJECTIFS</div>
+        </div>
+        <div class="step" data-step="3">
+            <div class="step-number">3</div>
+            <div class="step-label">PLANNING</div>
+        </div>
+        <div class="step" data-step="4">
+            <div class="step-number">4</div>
+            <div class="step-label">SANTÉ</div>
+        </div>
+    </div>
+
+    <!-- PROGRESS BAR -->
+    <div class="progress-container">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <div class="progress-text" id="progress-text">Étape 1 sur 4</div>
+    </div>
+
+    <!-- FORM -->
+    {{ form_start(form, {'attr': {'class': 'workout-form', 'id': 'workout-form'}}) }}
+    <div class="form-sections">
+
+        <!-- ÉTAPE 1: PROFIL -->
+        <div class="form-section active" id="step-1">
+            <h2 class="section-title">👤 Votre Profil Personnel</h2>
+            <div class="section-description">
+                Commençons par les bases. Ces informations nous aident à adapter votre programme à votre physique.
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    {{ form_label(form.gender, null, {'label_attr': {'class': 'required'}}) }}
+                    <div class="radio-group">
+                        {% for child in form.gender %}
+                            <div class="radio-option">
+                                {{ form_widget(child, {'attr': {'class': 'radio-input'}}) }}
+                                {{ form_label(child, null, {'label_attr': {'class': 'radio-label'}}) }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {{ form_errors(form.gender) }}
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(form.age, null, {'label_attr': {'class': 'required'}}) }}
+                    {{ form_widget(form.age) }}
+                    {{ form_errors(form.age) }}
+                </div>
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.weight) }}
+                <div class="input-with-icon">
+                    {{ form_widget(form.weight) }}
+                    <small style="display: block; margin-top: 8px; color: var(--gray-dark);">💡 Nous utiliserons cette information pour personnaliser vos exercices</small>
+                </div>
+                {{ form_errors(form.weight) }}
+            </div>
+        </div>
+
+        <!-- ÉTAPE 2: OBJECTIFS -->
+        <div class="form-section" id="step-2">
+            <h2 class="section-title">🎯 Vos Objectifs & Niveau</h2>
+            <div class="section-description">
+                Définissons où vous en êtes et où vous voulez aller. Soyez honnête pour des résultats optimaux !
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    {{ form_label(form.currentLevel, null, {'label_attr': {'class': 'required'}}) }}
+                    {{ form_widget(form.currentLevel) }}
+                    {{ form_errors(form.currentLevel) }}
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(form.primaryGoal, null, {'label_attr': {'class': 'required'}}) }}
+                    {{ form_widget(form.primaryGoal) }}
+                    {{ form_errors(form.primaryGoal) }}
+                </div>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 3: PLANNING -->
+        <div class="form-section" id="step-3">
+            <h2 class="section-title">🗓️ Votre Planning Idéal</h2>
+            <div class="section-description">
+                Adaptons votre programme à votre emploi du temps. La régularité est la clé du succès !
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    {{ form_label(form.sessionsPerWeek, null, {'label_attr': {'class': 'required'}}) }}
+                    {{ form_widget(form.sessionsPerWeek) }}
+                    {{ form_errors(form.sessionsPerWeek) }}
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(form.sessionDuration, null, {'label_attr': {'class': 'required'}}) }}
+                    {{ form_widget(form.sessionDuration) }}
+                    {{ form_errors(form.sessionDuration) }}
+                </div>
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.preferredSchedule, null, {'label_attr': {'class': 'required'}}) }}
+                <div class="checkbox-group">
+                    {% for child in form.preferredSchedule %}
+                        <div class="checkbox-option">
+                            {{ form_widget(child, {'attr': {'class': 'checkbox-input'}}) }}
+                            {{ form_label(child, null, {'label_attr': {'class': 'checkbox-label'}}) }}
+                        </div>
+                    {% endfor %}
+                </div>
+                {{ form_errors(form.preferredSchedule) }}
+            </div>
+        </div>
+
+        <!-- ÉTAPE 4: SANTÉ & ENVIRONNEMENT -->
+        <div class="form-section" id="step-4">
+            <h2 class="section-title">💪 Santé & Environnement</h2>
+            <div class="section-description">
+                Dernières informations pour affiner votre programme. Ces détails font toute la différence !
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    {{ form_label(form.workoutEnvironment, null, {'label_attr': {'class': 'required'}}) }}
+                    <div class="radio-group">
+                        {% for child in form.workoutEnvironment %}
+                            <div class="radio-option">
+                                {{ form_widget(child, {'attr': {'class': 'radio-input'}}) }}
+                                {{ form_label(child, null, {'label_attr': {'class': 'radio-label'}}) }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {{ form_errors(form.workoutEnvironment) }}
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(form.equipmentAvailable, null, {'label_attr': {'class': 'required'}}) }}
+                    {{ form_widget(form.equipmentAvailable) }}
+                    {{ form_errors(form.equipmentAvailable) }}
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    {{ form_label(form.motivationLevel, null, {'label_attr': {'class': 'required'}}) }}
+                    {{ form_widget(form.motivationLevel) }}
+                    {{ form_errors(form.motivationLevel) }}
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(form.sleepQuality, null, {'label_attr': {'class': 'required'}}) }}
+                    {{ form_widget(form.sleepQuality) }}
+                    {{ form_errors(form.sleepQuality) }}
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    {{ form_label(form.stressLevel) }}
+                    <div class="slider-container">
+                        <div class="slider-with-value">
+                            {{ form_widget(form.stressLevel, {'attr': {'oninput': 'updateStressValue(this.value)'}}) }}
+                            <span id="stress-value" class="slider-value">5</span>
+                        </div>
+                        <div class="slider-labels">
+                            <div class="slider-label">
+                                <span>😊</span>
+                                <span>Relax</span>
+                            </div>
+                            <div class="slider-label">
+                                <span>😐</span>
+                                <span>Normal</span>
+                            </div>
+                            <div class="slider-label">
+                                <span>😰</span>
+                                <span>Stressé</span>
+                            </div>
+                        </div>
+                    </div>
+                    {{ form_errors(form.stressLevel) }}
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(form.dailyWaterIntake, null, {'label_attr': {'class': 'required'}}) }}
+                    {{ form_widget(form.dailyWaterIntake) }}
+                    <small style="display: block; margin-top: 8px; color: var(--gray-dark);">💡 Objectif recommandé: 2-3L par jour</small>
+                    {{ form_errors(form.dailyWaterIntake) }}
+                </div>
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.physicalLimitations) }}
+                {{ form_widget(form.physicalLimitations) }}
+                <small style="display: block; margin-top: 8px; color: var(--gray-dark);">💡 Nous adapterons les exercices en conséquence pour votre sécurité</small>
+                {{ form_errors(form.physicalLimitations) }}
+            </div>
+
+            <!-- SUBMIT BUTTON (only visible in last step) -->
+            {{ form_widget(form.submit, {'attr': {'class': 'btn-submit', 'id': 'submit-btn'}}) }}
+        </div>
+
+    </div>
+
+    <!-- NAVIGATION BUTTONS (hidden in last step) -->
+    <div class="navigation-buttons" id="nav-buttons">
+        <button type="button" class="btn-nav btn-prev" id="prev-btn">
+            ← Précédent
+        </button>
+        <button type="button" class="btn-nav btn-next" id="next-btn">
+            Suivant →
+        </button>
+    </div>
+
+    {{ form_end(form) }}
+
+    <!-- FOOTER -->
+    <div class="footer-note">
+        <p>🔒 <strong>Vos données sont sécurisées</strong> • ⚡ <strong>Analyse en temps réel</strong> • 🎯 <strong>Programme 100% personnalisé</strong></p>
+    </div>
+</div>
+
+<script>
+    // Navigation par onglets
+    let currentStep = 1;
+    const totalSteps = 4;
+
+    // Éléments DOM
+    const steps = document.querySelectorAll('.step');
+    const sections = document.querySelectorAll('.form-section');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const submitBtn = document.getElementById('submit-btn');
+    const navButtons = document.getElementById('nav-buttons');
+    const progressFill = document.getElementById('progress-fill');
+    const progressText = document.getElementById('progress-text');
+
+    // Mettre à jour l'affichage
+    function updateDisplay() {
+        // Mettre à jour les étapes
+        steps.forEach(step => {
+            step.classList.remove('active');
+            if (parseInt(step.dataset.step) === currentStep) {
+                step.classList.add('active');
+            }
+        });
+
+        // Mettre à jour les sections
+        sections.forEach(section => {
+            section.classList.remove('active');
+            if (section.id === `step-${currentStep}`) {
+                section.classList.add('active');
+            }
+        });
+
+        // Mettre à jour la barre de progression
+        const progress = (currentStep / totalSteps) * 100;
+        progressFill.style.width = `${progress}%`;
+        progressText.textContent = `Étape ${currentStep} sur ${totalSteps}`;
+
+        // Gérer les boutons
+        if (currentStep === 1) {
+            prevBtn.style.visibility = 'hidden';
+        } else {
+            prevBtn.style.visibility = 'visible';
+        }
+
+        if (currentStep === totalSteps) {
+            nextBtn.style.display = 'none';
+            submitBtn.style.display = 'block';
+            navButtons.style.display = 'none';
+        } else {
+            nextBtn.style.display = 'flex';
+            submitBtn.style.display = 'none';
+            navButtons.style.display = 'flex';
+        }
+
+        // Vérifier la validité du step actuel
+        validateCurrentStep();
+    }
+
+    // Valider le step actuel
+    function validateCurrentStep() {
+        const currentSection = document.getElementById(`step-${currentStep}`);
+        const requiredFields = currentSection.querySelectorAll('[required]');
+        let isValid = true;
+
+        requiredFields.forEach(field => {
+            if (!field.value || (field.type === 'checkbox' && !field.checked)) {
+                isValid = false;
+            }
+        });
+
+        nextBtn.disabled = !isValid;
+        if (!isValid) {
+            nextBtn.style.opacity = '0.6';
+            nextBtn.style.cursor = 'not-allowed';
+        } else {
+            nextBtn.style.opacity = '1';
+            nextBtn.style.cursor = 'pointer';
+        }
+    }
+
+    // Navigation entre étapes en cliquant sur les steps
+    steps.forEach(step => {
+        step.addEventListener('click', () => {
+            const stepNumber = parseInt(step.dataset.step);
+            if (stepNumber < currentStep) {
+                currentStep = stepNumber;
+                updateDisplay();
+            }
+        });
+    });
+
+    // Bouton précédent
+    prevBtn.addEventListener('click', () => {
+        if (currentStep > 1) {
+            currentStep--;
+            updateDisplay();
+        }
+    });
+
+    // Bouton suivant
+    nextBtn.addEventListener('click', () => {
+        if (currentStep < totalSteps) {
+            currentStep++;
+            updateDisplay();
+        }
+    });
+
+    // Validation en temps réel
+    document.querySelectorAll('input, select, textarea').forEach(input => {
+        input.addEventListener('input', validateCurrentStep);
+        input.addEventListener('change', validateCurrentStep);
+    });
+
+    // Fonction pour le slider stress
+    function updateStressValue(value) {
+        const stressValue = document.getElementById('stress-value');
+        if (stressValue) {
+            stressValue.textContent = value;
+
+            // Changer la couleur
+            if (value <= 3) {
+                stressValue.style.color = '#2E8B57';
+                stressValue.style.borderColor = '#2E8B57';
+            } else if (value <= 7) {
+                stressValue.style.color = '#FFA500';
+                stressValue.style.borderColor = '#FFA500';
+            } else {
+                stressValue.style.color = '#FF6B35';
+                stressValue.style.borderColor = '#FF6B35';
+            }
+        }
+    }
+
+    // Initialisation
+    document.addEventListener('DOMContentLoaded', function() {
+        updateDisplay();
+
+        // Initialiser le slider
+        const stressSlider = document.querySelector('.stress-slider');
+        if (stressSlider) {
+            updateStressValue(stressSlider.value);
+        }
+
+        // Animation d'entrée
+        const formGroups = document.querySelectorAll('.form-group');
+        formGroups.forEach((group, index) => {
+            setTimeout(() => {
+                group.style.opacity = '1';
+                group.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    });
+
+    // Soumission du formulaire avec validation
+    document.getElementById('workout-form').addEventListener('submit', function(e) {
+        const allRequired = document.querySelectorAll('[required]');
+        let allValid = true;
+
+        allRequired.forEach(field => {
+            if (!field.value || (field.type === 'checkbox' && !field.checked)) {
+                allValid = false;
+                field.style.borderColor = '#dc3545';
+            }
+        });
+
+        if (!allValid) {
+            e.preventDefault();
+            alert('Veuillez remplir tous les champs obligatoires avant de soumettre.');
+        }
+    });
+</script>
+</body>
+</html>

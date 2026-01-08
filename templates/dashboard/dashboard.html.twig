@@ -64,8 +64,8 @@
                 </select>
             </div>
             <div class="chart-container">
-                <canvas id="progressChart"
-                        data-labels="{{ dashboard.weekly_progress.labels|json_encode }}"
+                <canvas id="progressChart" 
+                        data-labels="{{ dashboard.weekly_progress.labels|json_encode }}" 
                         data-calories="{{ dashboard.weekly_progress.calories|json_encode }}"
                         data-distance="{{ dashboard.weekly_progress.distance|json_encode }}">
                 </canvas>
@@ -82,7 +82,7 @@
                 </div>
             </div>
             <div class="chart-container">
-                <canvas id="caloriesChart"
+                <canvas id="caloriesChart" 
                         data-proteins="{{ dashboard.nutrition.proteins }}"
                         data-carbs="{{ dashboard.nutrition.carbs }}"
                         data-fats="{{ dashboard.nutrition.fats }}">
@@ -115,7 +115,7 @@
                         </div>
                         <div class="workout-details">
                             <h4>{{ workout.name }}</h4>
-                            <p>{{ workout.duration }} min •
+                            <p>{{ workout.duration }} min • 
                             {% if workout.calories is defined %}
                                 Brûle {{ workout.calories }} calories
                             {% elseif workout.type is defined %}
