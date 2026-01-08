@@ -58,51 +58,51 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'boolean')]
     private bool $isVerified = false;
 
-//relations notifications
-#[ORM\OneToMany(targetEntity: Notification::class, mappedBy: 'user')]
-private Collection $notifications;
+    //relations notifications
+    #[ORM\OneToMany(targetEntity: Notification::class, mappedBy: 'user')]
+    private Collection $notifications;
 
 
-//relation avec les messages
+    //relation avec les messages
     #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'sender')]
     private Collection $sentMessages;
 
 
     public function getNotifications(): Collection
-{
-    return $this->notifications;
-}
-
-public function addNotification(Notification $notification): static
-{
-    if (!$this->notifications->contains($notification)) {
-        $this->notifications->add($notification);
-        $notification->setUser($this);
+    {
+        return $this->notifications;
     }
-    return $this;
-}
 
-public function removeNotification(Notification $notification): static
-{
-    if ($this->notifications->removeElement($notification)) {
-        if ($notification->getUser() === $this) {
-            $notification->setUser(null);
+    public function addNotification(Notification $notification): static
+    {
+        if (!$this->notifications->contains($notification)) {
+            $this->notifications->add($notification);
+            $notification->setUser($this);
         }
+        return $this;
     }
-    return $this;
-}
 
-public function getUnreadNotifications(): array
-{
-    return $this->notifications->filter(function(Notification $notification) {
-        return !$notification->isIsRead();
-    })->toArray();
-}
+    public function removeNotification(Notification $notification): static
+    {
+        if ($this->notifications->removeElement($notification)) {
+            if ($notification->getUser() === $this) {
+                $notification->setUser(null);
+            }
+        }
+        return $this;
+    }
 
-public function getUnreadNotificationsCount(): int
-{
-    return count($this->getUnreadNotifications());
-}
+    public function getUnreadNotifications(): array
+    {
+        return $this->notifications->filter(function (Notification $notification) {
+            return !$notification->isIsRead();
+        })->toArray();
+    }
+
+    public function getUnreadNotificationsCount(): int
+    {
+        return count($this->getUnreadNotifications());
+    }
 
     #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'receiver')]
     private Collection $receivedMessages;
@@ -262,27 +262,32 @@ public function getUnreadNotificationsCount(): int
         return '/images/default-avatar.png';
     }
 
+    public function getCreatedAtString(): string
+    {
+        return $this->createdAt ? $this->createdAt->format('d/m/Y H:i') : '';
+    }
+
 
     // Ajoutez ces getters/setters
-public function getSentMessages(): Collection
-{
-    return $this->sentMessages;
-}
+    public function getSentMessages(): Collection
+    {
+        return $this->sentMessages;
+    }
 
-public function setSentMessages(Collection $sentMessages): void
-{
-    $this->sentMessages = $sentMessages;
-}
+    public function setSentMessages(Collection $sentMessages): void
+    {
+        $this->sentMessages = $sentMessages;
+    }
 
-public function getReceivedMessages(): Collection
-{
-    return $this->receivedMessages;
-}
+    public function getReceivedMessages(): Collection
+    {
+        return $this->receivedMessages;
+    }
 
-public function setReceivedMessages(Collection $receivedMessages): void
-{
-    $this->receivedMessages = $receivedMessages;
-}
+    public function setReceivedMessages(Collection $receivedMessages): void
+    {
+        $this->receivedMessages = $receivedMessages;
+    }
 
 
 }
