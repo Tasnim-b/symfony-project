@@ -3,8 +3,14 @@
 import os
 import sys
 
+try:
+    import dotenv
+except ImportError:
+    dotenv = None
 
 def main():
+    if dotenv:
+        dotenv.load_dotenv()
     """Run administrative tasks."""
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'chatbot_core.settings')
     try:

@@ -11,6 +11,14 @@ scikit-learn = "*"
 numpy = "*"
 nltk = "*"
 requests = "*"
+langchain = "*"
+langchain-community = "*"
+langchain-openai = "*"
+chromadb = "*"
+pypdf = "*"
+sentence-transformers = "*"
+python-dotenv = "*"
+langchain-google-genai = "*"
 
 [dev-packages]
 

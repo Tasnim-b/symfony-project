@@ -488,6 +488,8 @@
                 formatted = formatted
                     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                     .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                    .replace(/^- (.*)$/gm, '• $1')
+                    .replace(/^• (.*)$/gm, '• $1')
                     .replace(/💡/g, '💡 ')
                     .replace(/📚/g, '<br>📚 ')
                     .replace(/⚠️/g, '<br>⚠️ ')
